@@ -16,11 +16,13 @@ public class Accumulator implements ActionListener
 	private JFrame window = new JFrame("Calculator");
 	private JTextField inputTextField = new JTextField(20);
 	private JTextField outputTextField = new JTextField(20);
+	private JTextField precisionTextField = new JTextField(20); 
 	private JTextArea logTextArea = new JTextArea();
 	private JScrollPane logScrollPane = new JScrollPane(logTextArea);
 	private JLabel inputLabel = new JLabel("Enter input");
 	private JLabel outputLabel = new JLabel(" Result -> ");
 	private JLabel errorLabel = new JLabel("");
+	private JButton precisionButton = new JButton("Update Precision:");
 	private JButton clearButton = new JButton("Clear");
 	private JPanel topPanel = new JPanel(new GridBagLayout());
 	GridBagConstraints c = new GridBagConstraints();
@@ -59,6 +61,8 @@ public class Accumulator implements ActionListener
 		bottomPanel.add(accumulatorMode);
 		bottomPanel.add(calculatorMode);
 		bottomPanel.add(testMode);
+		bottomPanel.add(precisionButton);
+		bottomPanel.add(precisionTextField);
 		bottomPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mode Select"));
 		
 		window.getContentPane().add(topPanel, "North");
@@ -84,6 +88,7 @@ public class Accumulator implements ActionListener
 		
 		// Set event notification
 		inputTextField.addActionListener(this);
+		precisionButton.addActionListener(this);
 		clearButton.addActionListener(this);
 		accumulatorMode.addActionListener(this);
 		calculatorMode.addActionListener(this);
@@ -230,6 +235,26 @@ public class Accumulator implements ActionListener
 			outputTextField.setText("");
 			mode = "test";
 			}
+		
+		if(ae.getSource() == precisionButton)
+			{
+			try
+				{
+				int temp = Integer.parseInt(precisionTextField.getText());
+				if(temp <= 0)
+					errorLabel.setText("Precision must be a positive integer");
+				else
+					{
+					precision = temp;
+					errorLabel.setText("");
+					}
+				}
+			catch(NumberFormatException nfe)
+				{
+				errorLabel.setText("Precision must be a positive integer");
+				}
+			}
+		
 		}
 		
 	Double runningTotal = 0.00;
