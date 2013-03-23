@@ -13,22 +13,22 @@ public class Accumulator implements ActionListener
 	private String newLine = System.getProperty("line.separator");
 	
 	//GUI Objects
-	private JFrame window = new JFrame("Calculator");
-	private JTextField inputTextField = new JTextField(20);
-	private JTextField outputTextField = new JTextField(20);
-	private JTextArea logTextArea = new JTextArea();
-	private JScrollPane logScrollPane = new JScrollPane(logTextArea);
-	private JLabel inputLabel = new JLabel("Enter input");
-	private JLabel outputLabel = new JLabel(" Result -> ");
-	private JLabel errorLabel = new JLabel("");
-	private JButton clearButton = new JButton("Clear");
-	private JPanel topPanel = new JPanel(new GridBagLayout());
-	GridBagConstraints c = new GridBagConstraints();
+	private JFrame       window          = new JFrame("Calculator");
+	private JTextField   inputTextField  = new JTextField(20);
+	private JTextField   outputTextField = new JTextField(20);
+	private JTextArea    logTextArea     = new JTextArea();
+	private JScrollPane  logScrollPane   = new JScrollPane(logTextArea);
+	private JLabel       inputLabel      = new JLabel("Enter input");
+	private JLabel       outputLabel     = new JLabel(" Result -> ");
+	private JLabel       errorLabel      = new JLabel("");
+	private JButton      clearButton     = new JButton("Clear");
+	private JPanel       topPanel        = new JPanel(new GridBagLayout());
+	GridBagConstraints   c               = new GridBagConstraints();
 	private JRadioButton accumulatorMode = new JRadioButton("Accumulator", true);
-	private JRadioButton calculatorMode = new JRadioButton("Calculator", false);
-	private JRadioButton testMode = new JRadioButton("Test Mode", false);
-	private ButtonGroup bGroup = new ButtonGroup();
-	private JPanel bottomPanel = new JPanel();
+	private JRadioButton calculatorMode  = new JRadioButton("Calculator", false);
+	private JRadioButton testMode        = new JRadioButton("Test Mode", false);
+	private ButtonGroup  bGroup          = new ButtonGroup();
+	private JPanel       bottomPanel     = new JPanel();
 	
 	public Accumulator()
 		{
