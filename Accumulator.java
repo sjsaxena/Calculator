@@ -33,7 +33,9 @@ public class Accumulator implements ActionListener
 	
 	public Accumulator()
 		{
-		// Build GUI
+		// -------------------------------------			
+		// ----------- BUILD GUI ---------------
+		// -------------------------------------
 		
 		//topPanel is created using GridBag to make error message appear on new row
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -91,6 +93,7 @@ public class Accumulator implements ActionListener
 
 	String mode = "accumulator";
 	int precision = 2; 
+	
 	public void actionPerformed(ActionEvent ae)
 		{
 		String input = null;
@@ -133,7 +136,7 @@ public class Accumulator implements ActionListener
 			// -------- PROCESSING INPUT -----------
 			// -------------------------------------
 			
-			// Accumulator Mode 
+			// ACCUMULATOR MODE
 			if(mode.equals("accumulator"))
 				{
 				// input cannot contain * or /, and can only use + or - to indicate sign
@@ -170,7 +173,7 @@ public class Accumulator implements ActionListener
 				inputTextField.setText("");
 				} 
 			
-			// Calculator Mode
+			// CALCULATOR MODE
 			if(mode.equals("calculator"))
 				{
 				// input cannot contain =
@@ -187,16 +190,19 @@ public class Accumulator implements ActionListener
 				outputTextField.setText(result);
 				}
 			
-			// Test Mode
+			// TEST MODE
 			if(mode.equals("test"))
 				{
 				result = testFunction(input);
+				logEntry = result + newLine;
+				logTextArea.append(logEntry);
+				outputTextField.setText(logEntry);
 				}
 				
 			} 
-			// end of inputTextField resonse
+			// end of inputTextField response
 		
-		// When the clear button is pressed...
+		// Clear button
 		if(ae.getSource() == clearButton)
 			{
 			// clear fields
@@ -285,7 +291,10 @@ public class Accumulator implements ActionListener
 	        											        {
 	        														if(!(c == '/'))
 	        												        {
-	        												        	return true;
+	        															if(!(c == '='))
+		        												        {
+		        												        	return true;
+		        												        }
 	        												        }
 	        											        }
 	        										        }
