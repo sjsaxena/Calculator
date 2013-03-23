@@ -13,22 +13,23 @@ public class Accumulator implements ActionListener
 	private String newLine = System.getProperty("line.separator");
 	
 	//GUI Objects
-	private JFrame       window          = new JFrame("Calculator");
-	private JTextField   inputTextField  = new JTextField(20);
-	private JTextField   outputTextField = new JTextField(20);
-	private JTextArea    logTextArea     = new JTextArea();
-	private JScrollPane  logScrollPane   = new JScrollPane(logTextArea);
-	private JLabel       inputLabel      = new JLabel("Enter input");
-	private JLabel       outputLabel     = new JLabel(" Result -> ");
-	private JLabel       errorLabel      = new JLabel("");
-	private JButton      clearButton     = new JButton("Clear");
-	private JPanel       topPanel        = new JPanel(new GridBagLayout());
-	GridBagConstraints   c               = new GridBagConstraints();
+	private JFrame window = new JFrame("Calculator");
+	private JTextField inputTextField = new JTextField(20);
+	private JTextField outputTextField = new JTextField(20);
+	private JTextArea logTextArea = new JTextArea();
+	private JScrollPane logScrollPane = new JScrollPane(logTextArea);
+	private JLabel inputLabel = new JLabel("Enter input");
+	private JLabel outputLabel = new JLabel(" Result -> ");
+	private JLabel errorLabel = new JLabel("");
+	private JButton clearButton = new JButton("Clear");
+	private JPanel topPanel = new JPanel(new GridBagLayout());
+	GridBagConstraints c = new GridBagConstraints();
 	private JRadioButton accumulatorMode = new JRadioButton("Accumulator", true);
-	private JRadioButton calculatorMode  = new JRadioButton("Calculator", false);
-	private JRadioButton testMode        = new JRadioButton("Test Mode", false);
-	private ButtonGroup  bGroup          = new ButtonGroup();
-	private JPanel       bottomPanel     = new JPanel();
+	private JRadioButton calculatorMode = new JRadioButton("Calculator", false);
+	private JRadioButton testMode = new JRadioButton("Test Mode", false);
+	private ButtonGroup bGroup = new ButtonGroup();
+	private JPanel bottomPanel = new JPanel();
+	
 	
 	public Accumulator()
 		{
@@ -51,8 +52,6 @@ public class Accumulator implements ActionListener
 		c.gridx = 0;
 		c.gridy = 1;
 		topPanel.add(errorLabel,c);
-		
-		
 		
 		bottomPanel.setLayout(new GridLayout(1,3));
 		bottomPanel.add(accumulatorMode);
@@ -91,6 +90,7 @@ public class Accumulator implements ActionListener
 		}
 
 	String mode = "accumulator";
+	int precision = 2; 
 	public void actionPerformed(ActionEvent ae)
 		{
 		String input = null;
@@ -101,91 +101,137 @@ public class Accumulator implements ActionListener
 			{
 			// error message is removed
 			errorLabel.setText("");
+			
 			// input is received
 			input = inputTextField.getText().trim();
 			input = input.replace(" ", "");
-			// input cannot contain a letter
+			if(input.length() == 0)
+				{
+				errorLabel.setText("Please enter a value");
+				return;
+				}
+			// check to make sure input is comprised of numbers and operators,
+			// does not begin or end with an operator,
+			// and does not contain multiple operators in a row
 			if(containsLetters(input))
 				{
-				errorLabel.setText("Input cannot contain letters");
+				errorLabel.setText("Input can only be comprised of numbers and operators");
+				return;
 				}
-			// input cannot begin with operator
-			else if( input.startsWith("*") || input.startsWith("/") )
+			if( input.startsWith("*") || input.startsWith("/") || input.endsWith("*") || input.endsWith("/") || input.endsWith("+") || input.endsWith("-"))
 				{
-				errorLabel.setText("Cannot begin expression with an operator");
+				errorLabel.setText("Cannot begin or end expression with an operator");
+				return;
 				}
-			// otherwise, send to processing
-			else
+			if(input.contains("++") || input.contains("--") || input.contains("**") || input.contains("//"))
 				{
-				if(mode.equals("accumulator"))
-					{
-					//check for stuff
-					if(input.contains("*") || input.contains("/"))
-						{
-						errorLabel.setText("For * and /, please use calculator mode");
-						}
-					// if it is okay, send to accumulator
-					else
-						{
-						result = accumulatorFunction(input);
-						}
-					}
-				if(mode.equals("calculator"))
-					{
-					//check for stuff
-					if(input.contains("="))
-						{
-						errorLabel.setText("For = comparisons, please use test mode");
-						}
-					// if it is okay, send to accumulator
-					else
-						{
-						result = calculatorFunction(input);
-						}
-					}
-				if(mode.equals("test"))
-					{
-					//check for stuff
-					// if the string is okay
-					result = testFunction(input);
-					}
-				}
-			}
-		
-			// When the clear button is pressed...
-			if(ae.getSource() == clearButton)
-				{
-				// clear fields
-				inputTextField.setText("");
-				outputTextField.setText("");
+				errorLabel.setText("You have multiple operators in a row!");
+				return;
 				}
 			
-			// If a mode radio button is pressed, clear the fields and set the mode
-			if(ae.getSource() == accumulatorMode)
+			// -------------------------------------			
+			// -------- PROCESSING INPUT -----------
+			// -------------------------------------
+			
+			// Accumulator Mode 
+			if(mode.equals("accumulator"))
 				{
+				// input cannot contain * or /, and can only use + or - to indicate sign
+				if(input.contains("*") || input.contains("/"))
+					{
+					errorLabel.setText("For * and /, please use calculator mode");
+					return;
+					}
+				if(input.startsWith("+") || input.startsWith("-"))
+					{
+					String temp = input.substring(1);
+					if(temp.contains("+") || temp.contains("-"))
+						{
+						errorLabel.setText("+/- can only set sign. Use calculator for expresions");
+						return;
+						}
+					}
+				if(input.contains("."))
+					{
+					String temp = input.substring(input.indexOf("."));
+					if(temp.length() != (precision+1))
+						{
+						errorLabel.setText("Must use " + precision + " digits of precision.");
+						return;
+						}
+					}
+				
+				// process accumulator
+				Double previousTotal = runningTotal;
+				result = accumulatorFunction(input);
+				outputTextField.setText(result);
+				logEntry = Double.toString(previousTotal) + " + " + input + " = " + result + newLine;
+				logTextArea.append(logEntry);
 				inputTextField.setText("");
-				outputTextField.setText("");
-				mode = "accumulator";
-				}
-			if(ae.getSource() == calculatorMode)
+				} 
+			
+			// Calculator Mode
+			if(mode.equals("calculator"))
 				{
-				inputTextField.setText("");
-				outputTextField.setText("");
-				mode = "calculator";
+				// input cannot contain =
+				if(input.contains("="))
+					{
+					errorLabel.setText("For = comparisons, please use test mode");
+					return;
+					}
+				
+				//process calculator
+				result = calculatorFunction(input);
+				logEntry = input + " = " + result + newLine;
+				logTextArea.append(logEntry);
+				outputTextField.setText(result);
 				}
-			if(ae.getSource() == testMode)
+			
+			// Test Mode
+			if(mode.equals("test"))
 				{
-				inputTextField.setText("");
-				outputTextField.setText("");
-				mode = "test";
+				result = testFunction(input);
 				}
+				
+			} 
+			// end of inputTextField resonse
+		
+		// When the clear button is pressed...
+		if(ae.getSource() == clearButton)
+			{
+			// clear fields
+			inputTextField.setText("");
+			outputTextField.setText("");
+			runningTotal = 0.00;
 			}
 		
-	
+		// If a mode radio button is pressed, clear the fields and set the mode
+		if(ae.getSource() == accumulatorMode)
+			{
+			inputTextField.setText("");
+			outputTextField.setText("");
+			mode = "accumulator";
+			}
+		if(ae.getSource() == calculatorMode)
+			{
+			inputTextField.setText("");
+			outputTextField.setText("");
+			mode = "calculator";
+			}
+		if(ae.getSource() == testMode)
+			{
+			inputTextField.setText("");
+			outputTextField.setText("");
+			mode = "test";
+			}
+		}
+		
+	Double runningTotal = 0.00;
 	public String accumulatorFunction(String entry)
 		{
-		String result = "lolcatz";
-			
+		Double temp = Double.parseDouble(entry);
+		runningTotal += temp;
+		String result = Double.toString(runningTotal);
 		return result;
 		}
 	
@@ -209,10 +255,52 @@ public class Accumulator implements ActionListener
 
 	    for (char c : chars)
 	    	{
-	        if(Character.isLetter(c))
-	        	{
-	        	return true;
-	        	}
+	        if(!(c == '0'))
+	        {
+	        	if(!(c == '1'))
+		        {
+	        		if(!(c == '2'))
+	    	        {
+	        			if(!(c == '3'))
+	        	        {
+	        				if(!(c == '4'))
+	        		        {
+	        					if(!(c == '5'))
+	        			        {
+	        						if(!(c == '6'))
+	        				        {
+	        							if(!(c == '7'))
+	        					        {
+	        								if(!(c == '8'))
+	        						        {
+	        									if(!(c == '9'))
+	        							        {
+	        										if(!(c == '.'))
+	        								        {
+	        											if(!(c == '+'))
+	        									        {
+	        												if(!(c == '-'))
+	        										        {
+	        													if(!(c == '*'))
+	        											        {
+	        														if(!(c == '/'))
+	        												        {
+	        												        	return true;
+	        												        }
+	        											        }
+	        										        }
+	        									        }
+	        								        }
+	        							        }
+	        						        }
+	        					        }
+	        				        }
+	        			        }
+	        		        }
+	        	        }
+	    	        }
+		        }
+	        }
 	    	}
 	    return false;
 		}
