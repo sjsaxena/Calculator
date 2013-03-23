@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.Stack;
 
 public class Accumulator implements ActionListener
 {
@@ -24,6 +25,7 @@ public class Accumulator implements ActionListener
 	private JLabel errorLabel = new JLabel("");
 	private JButton precisionButton = new JButton("Update Precision:");
 	private JButton clearButton = new JButton("Clear");
+	private JButton recallButton = new JButton("Prev");
 	private JPanel topPanel = new JPanel(new GridBagLayout());
 	GridBagConstraints c = new GridBagConstraints();
 	private JRadioButton accumulatorMode = new JRadioButton("Accumulator", true);
@@ -43,16 +45,18 @@ public class Accumulator implements ActionListener
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
-		topPanel.add(inputLabel, c);	
+		topPanel.add(recallButton, c);
 		c.gridx = 1;
-		topPanel.add(inputTextField, c);
+		topPanel.add(inputLabel, c);	
 		c.gridx = 2;
-		topPanel.add(outputLabel, c);
+		topPanel.add(inputTextField, c);
 		c.gridx = 3;
-		topPanel.add(outputTextField, c);
+		topPanel.add(outputLabel, c);
 		c.gridx = 4;
+		topPanel.add(outputTextField, c);
+		c.gridx = 5;
 		topPanel.add(clearButton, c);	
-		c.gridwidth = 5;
+		c.gridwidth = 6;
 		c.gridx = 0;
 		c.gridy = 1;
 		topPanel.add(errorLabel,c);
@@ -89,15 +93,18 @@ public class Accumulator implements ActionListener
 		// Set event notification
 		inputTextField.addActionListener(this);
 		precisionButton.addActionListener(this);
+		recallButton.addActionListener(this);
 		clearButton.addActionListener(this);
 		accumulatorMode.addActionListener(this);
 		calculatorMode.addActionListener(this);
 		testMode.addActionListener(this);
 		
+		
 		}
 
 	String mode = "accumulator";
 	int precision = 2; 
+	Stack<String> expressionLIFO = new Stack<String>();
 	
 	public void actionPerformed(ActionEvent ae)
 		{
@@ -171,6 +178,7 @@ public class Accumulator implements ActionListener
 				
 				// process accumulator
 				Double previousTotal = runningTotal;
+				expressionLIFO.push(input);
 				result = accumulatorFunction(input);
 				outputTextField.setText(result);
 				logEntry = Double.toString(previousTotal) + " + " + input + " = " + result + newLine;
@@ -189,6 +197,7 @@ public class Accumulator implements ActionListener
 					}
 				
 				//process calculator
+				expressionLIFO.push(input);
 				result = calculatorFunction(input);
 				logEntry = input + " = " + result + newLine;
 				logTextArea.append(logEntry);
@@ -198,6 +207,7 @@ public class Accumulator implements ActionListener
 			// TEST MODE
 			if(mode.equals("test"))
 				{
+				expressionLIFO.push(input);
 				result = testFunction(input);
 				logEntry = result + newLine;
 				logTextArea.append(logEntry);
@@ -234,6 +244,15 @@ public class Accumulator implements ActionListener
 			inputTextField.setText("");
 			outputTextField.setText("");
 			mode = "test";
+			}
+		
+		if(ae.getSource() == recallButton)
+			{
+			System.out.println("here!");
+			if(!expressionLIFO.empty())
+				{
+				inputTextField.setText(expressionLIFO.pop());
+				}
 			}
 		
 		if(ae.getSource() == precisionButton)
