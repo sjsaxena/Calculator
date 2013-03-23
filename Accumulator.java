@@ -11,10 +11,11 @@ public class Accumulator implements ActionListener
 	public static void main(String[] args){
 		new Accumulator();
 		}
-
+	
+	
 	// newLine
 	private String newLine = System.getProperty("line.separator");
-	
+		
 	//GUI Objects
 	private JFrame window = new JFrame("Calculator");
 	private JTextField inputTextField = new JTextField(20);
@@ -35,7 +36,6 @@ public class Accumulator implements ActionListener
 	private JRadioButton testMode = new JRadioButton("Test Mode", false);
 	private ButtonGroup bGroup = new ButtonGroup();
 	private JPanel bottomPanel = new JPanel();
-	
 	
 	public Accumulator()
 		{
@@ -209,6 +209,11 @@ public class Accumulator implements ActionListener
 			// TEST MODE
 			if(mode.equals("test"))
 				{
+				if(input.indexOf("=") != input.lastIndexOf("="))
+					{
+					errorLabel.setText("You can only have one = sign in the expression!");
+					return;
+					}
 				expressionLIFO.push(input);
 				result = testFunction(input);
 				logEntry = result + newLine;
