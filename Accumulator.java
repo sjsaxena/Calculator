@@ -90,50 +90,137 @@ public class Accumulator implements ActionListener
 		
 		}
 
-	String entry;
 	String mode = "accumulator";
 	public void actionPerformed(ActionEvent ae)
 		{
+		String input = null;
+		String result = null;
+		String logEntry = null;
 		// When input is entered...
 		if(ae.getSource() == inputTextField)
 			{
 			// error message is removed
 			errorLabel.setText("");
-			entry = inputTextField.getText();
-			// add text to log
-			logTextArea.append(mode + ": " + entry + newLine);
-			outputTextField.setText(entry);
+			// input is received
+			input = inputTextField.getText().trim();
+			input = input.replace(" ", "");
+			// input cannot contain a letter
+			if(containsLetters(input))
+				{
+				errorLabel.setText("Input cannot contain letters");
+				}
+			// input cannot begin with operator
+			else if( input.startsWith("*") || input.startsWith("/") )
+				{
+				errorLabel.setText("Cannot begin expression with an operator");
+				}
+			// otherwise, send to processing
+			else
+				{
+				if(mode.equals("accumulator"))
+					{
+					//check for stuff
+					if(input.contains("*") || input.contains("/"))
+						{
+						errorLabel.setText("For * and /, please use calculator mode");
+						}
+					// if it is okay, send to accumulator
+					else
+						{
+						result = accumulatorFunction(input);
+						}
+					}
+				if(mode.equals("calculator"))
+					{
+					//check for stuff
+					if(input.contains("="))
+						{
+						errorLabel.setText("For = comparisons, please use test mode");
+						}
+					// if it is okay, send to accumulator
+					else
+						{
+						result = calculatorFunction(input);
+						}
+					}
+				if(mode.equals("test"))
+					{
+					//check for stuff
+					// if the string is okay
+					result = testFunction(input);
+					}
+				}
+			// display result
+			outputTextField.setText(result);
 			}
 		
-		// When the clear button is pressed...
-		if(ae.getSource() == clearButton)
-			{
-			// clear fields
-			inputTextField.setText("");
-			outputTextField.setText("");
+			// When the clear button is pressed...
+			if(ae.getSource() == clearButton)
+				{
+				// clear fields
+				inputTextField.setText("");
+				outputTextField.setText("");
+				}
+			
+			// If a mode radio button is pressed, clear the fields and set the mode
+			if(ae.getSource() == accumulatorMode)
+				{
+				inputTextField.setText("");
+				outputTextField.setText("");
+				mode = "accumulator";
+				}
+			if(ae.getSource() == calculatorMode)
+				{
+				inputTextField.setText("");
+				outputTextField.setText("");
+				mode = "calculator";
+				}
+			if(ae.getSource() == testMode)
+				{
+				inputTextField.setText("");
+				outputTextField.setText("");
+				mode = "test";
+				}
 			}
 		
-		// If a mode radio button is pressed, clear the fields and set the mode
-		if(ae.getSource() == accumulatorMode)
-			{
-			inputTextField.setText("");
-			outputTextField.setText("");
-			mode = "accumulator";
-			}
-		if(ae.getSource() == calculatorMode)
-			{
-			inputTextField.setText("");
-			outputTextField.setText("");
-			mode = "calculator";
-			errorLabel.setText("Error! You have done something very stupid!");
-			}
-		if(ae.getSource() == testMode)
-			{
-			inputTextField.setText("");
-			outputTextField.setText("");
-			mode = "test";
-			}
+	
+	// instance variable for running total
+	Double runningTotal = 0.00;
+	
+	public String accumulatorFunction(String entry)
+		{
+		Double temp = Double.parseDouble(entry);
+		runningTotal += temp;
+		String result = Double.toString(runningTotal);
+		return result;
 		}
+	
+	public String calculatorFunction(String entry)
+		{
+		String result = "lolcatz";
+		
+		return result;
+		}
+	
+	public String testFunction(String entry)
+		{
+		String result = "lolcatz";
+		
+		return result;
+		}
+	
+	public boolean containsLetters(String input)
+		{
+	    char[] chars = input.toCharArray();
 
+	    for (char c : chars)
+	    	{
+	        if(Character.isLetter(c))
+	        	{
+	        	return true;
+	        	}
+	    	}
+	    return false;
+		}
 	
 }
