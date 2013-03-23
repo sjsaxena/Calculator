@@ -11,7 +11,7 @@ public class Accumulator implements ActionListener
 
 	// newLine
 	private String newLine = System.getProperty("line.separator");
-	
+
 	//GUI Objects
 	private JFrame       window          = new JFrame("Calculator");
 	private JTextField   inputTextField  = new JTextField(20);
@@ -29,11 +29,11 @@ public class Accumulator implements ActionListener
 	private JRadioButton testMode        = new JRadioButton("Test Mode", false);
 	private ButtonGroup  bGroup          = new ButtonGroup();
 	private JPanel       bottomPanel     = new JPanel();
-	
+
 	public Accumulator()
 		{
 		// Build GUI
-		
+
 		//topPanel is created using GridBag to make error message appear on new row
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
@@ -51,19 +51,19 @@ public class Accumulator implements ActionListener
 		c.gridx = 0;
 		c.gridy = 1;
 		topPanel.add(errorLabel,c);
-		
-		
-		
+
+
+
 		bottomPanel.setLayout(new GridLayout(1,3));
 		bottomPanel.add(accumulatorMode);
 		bottomPanel.add(calculatorMode);
 		bottomPanel.add(testMode);
 		bottomPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mode Select"));
-		
+
 		window.getContentPane().add(topPanel, "North");
 		window.getContentPane().add(logScrollPane, "Center");
 		window.getContentPane().add(bottomPanel, "South");
-		
+
 		// Set GUI attributes
 		bGroup.add(accumulatorMode);
 		bGroup.add(calculatorMode);
@@ -80,60 +80,153 @@ public class Accumulator implements ActionListener
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    window.setVisible(true);
 	    logTextArea.setText(""); //  clear log
-		
+
 		// Set event notification
 		inputTextField.addActionListener(this);
 		clearButton.addActionListener(this);
 		accumulatorMode.addActionListener(this);
 		calculatorMode.addActionListener(this);
 		testMode.addActionListener(this);
-		
+
 		}
 
-	String entry;
 	String mode = "accumulator";
 	public void actionPerformed(ActionEvent ae)
 		{
+		String input = null;
+		String result = null;
+		String logEntry = null;
 		// When input is entered...
 		if(ae.getSource() == inputTextField)
 			{
 			// error message is removed
 			errorLabel.setText("");
-			entry = inputTextField.getText();
-			// add text to log
-			logTextArea.append(mode + ": " + entry + newLine);
-			outputTextField.setText(entry);
+			// input is received
+			input = inputTextField.getText().trim();
+			input = input.replace(" ", "");
+			// input cannot contain a letter
+			if(containsLetters(input))
+				{
+				errorLabel.setText("Input cannot contain letters");
+				}
+			// input cannot begin with operator
+			else if( input.startsWith("*") || input.startsWith("/") )
+				{
+				errorLabel.setText("Cannot begin expression with an operator");
+				}
+			// otherwise, send to processing
+			else
+				{
+				if(mode.equals("accumulator"))
+					{
+					//check for stuff
+					if(input.contains("*") || input.contains("/"))
+						{
+						errorLabel.setText("For * and /, please use calculator mode");
+						}
+					// if it is okay, send to accumulator
+					else
+						{
+						result = accumulatorFunction(input);
+						}
+					}
+				if(mode.equals("calculator"))
+					{
+					//check for stuff
+					if(input.contains("="))
+						{
+						errorLabel.setText("For = comparisons, please use test mode");
+						}
+					// if it is okay, send to accumulator
+					else
+						{
+						result = calculatorFunction(input);
+						}
+					}
+				if(mode.equals("test"))
+					{
+					//check for stuff
+					// if the string is okay
+					result = testFunction(input);
+					}
+				}
 			}
-		
-		// When the clear button is pressed...
-		if(ae.getSource() == clearButton)
-			{
-			// clear fields
-			inputTextField.setText("");
-			outputTextField.setText("");
+
+			// When the clear button is pressed...
+			if(ae.getSource() == clearButton)
+				{
+				// clear fields
+				inputTextField.setText("");
+				outputTextField.setText("");
+				}
+
+			// If a mode radio button is pressed, clear the fields and set the mode
+			if(ae.getSource() == accumulatorMode)
+				{
+				inputTextField.setText("");
+				outputTextField.setText("");
+				mode = "accumulator";
+				}
+			if(ae.getSource() == calculatorMode)
+				{
+				inputTextField.setText("");
+				outputTextField.setText("");
+				mode = "calculator";
+				}
+			if(ae.getSource() == testMode)
+				{
+				inputTextField.setText("");
+				outputTextField.setText("");
+				mode = "test";
+				}
 			}
-		
-		// If a mode radio button is pressed, clear the fields and set the mode
-		if(ae.getSource() == accumulatorMode)
-			{
-			inputTextField.setText("");
-			outputTextField.setText("");
-			mode = "accumulator";
-			}
-		if(ae.getSource() == calculatorMode)
-			{
-			inputTextField.setText("");
-			outputTextField.setText("");
-			mode = "calculator";
-			errorLabel.setText("Error! You have done something very stupid!");
-			}
-		if(ae.getSource() == testMode)
-			{
-			inputTextField.setText("");
-			outputTextField.setText("");
-			mode = "test";
-			}
+
+
+	public String accumulatorFunction(String entry)
+		{
+		String result = "lolcatz";
+
+		return result;
 		}
 
-	
+	public String calculatorFunction(String entry)
+		{
+		String result = "lolcatz";
+		String result = "lolcatz";
+		char ops[] = {'*','/','+','-'};
+		int i,left,middle,right = -1; 
+		for(i=0;i<entry.length();i++){
+			char A = entry.charAt(i);
+			if((A == ops[0])||(A == ops[1])||(A == ops[2])||(A == ops[3])){ //if any operator is found, continue
+				
+				
+			}
+		
+		
+		
+
+		return result;
+		}
+
+	public String testFunction(String entry)
+		{
+		String result = "lolcatz";
+
+		return result;
+		}
+
+	public boolean containsLetters(String input)
+		{
+	    char[] chars = input.toCharArray();
+
+	    for (char c : chars)
+	    	{
+	        if(Character.isLetter(c))
+	        	{
+	        	return true;
+	        	}
+	    	}
+	    return false;
+		}
+
 }
