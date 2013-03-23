@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
+import java.math.BigDecimal;
 import java.util.Stack;
 
 public class Accumulator implements ActionListener
@@ -248,7 +250,6 @@ public class Accumulator implements ActionListener
 		
 		if(ae.getSource() == recallButton)
 			{
-			System.out.println("here!");
 			if(!expressionLIFO.empty())
 				{
 				inputTextField.setText(expressionLIFO.pop());
@@ -261,7 +262,10 @@ public class Accumulator implements ActionListener
 				{
 				int temp = Integer.parseInt(precisionTextField.getText());
 				if(temp <= 0)
+					{
 					errorLabel.setText("Precision must be a positive integer");
+					precisionTextField.setText(Integer.toString(precision));
+					}
 				else
 					{
 					precision = temp;
@@ -281,7 +285,8 @@ public class Accumulator implements ActionListener
 		{
 		Double temp = Double.parseDouble(entry);
 		runningTotal += temp;
-		String result = Double.toString(runningTotal);
+		BigDecimal bd = new BigDecimal(runningTotal).setScale(precision, BigDecimal.ROUND_HALF_UP);
+		String result = bd.toString();
 		return result;
 		}
 	
