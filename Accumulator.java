@@ -231,6 +231,7 @@ public class Accumulator implements ActionListener
 			inputTextField.setText("");
 			outputTextField.setText("");
 			runningTotal = 0.00;
+			inputTextField.requestFocus();
 			}
 		
 		// If a mode radio button is pressed, clear the fields and set the mode
@@ -239,18 +240,21 @@ public class Accumulator implements ActionListener
 			inputTextField.setText("");
 			outputTextField.setText("");
 			mode = "accumulator";
+			inputTextField.requestFocus();
 			}
 		if(ae.getSource() == calculatorMode)
 			{
 			inputTextField.setText("");
 			outputTextField.setText("");
 			mode = "calculator";
+			inputTextField.requestFocus();
 			}
 		if(ae.getSource() == testMode)
 			{
 			inputTextField.setText("");
 			outputTextField.setText("");
 			mode = "test";
+			inputTextField.requestFocus();
 			}
 		
 		if(ae.getSource() == recallButton)
@@ -275,6 +279,7 @@ public class Accumulator implements ActionListener
 					{
 					precision = temp;
 					errorLabel.setText("");
+					inputTextField.requestFocus();
 					}
 				}
 			catch(NumberFormatException nfe)
