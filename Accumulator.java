@@ -1,5 +1,3 @@
-// Accumulator Branch
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -197,12 +195,159 @@ public class Accumulator implements ActionListener
 		return result;
 		}
 	
+	
+	  
+	
 	public String calculatorFunction(String entry)
-		{
-		String result = "lolcatz";
-		
+	  {
+	  String result = "";
+	  
+	// State 0 => no operators found
+		  // State 1 => one operator found
+		  // State 2 => two operators found
+		  // State 3 => at least three operators found
+		  int opCount = 0;
+		  
+		  // array of acceptable operators
+		  char ops[] = {'*','/','+','-'};
+		  
+		  // operand
+		  char operand = '0';
+		  
+		  // variables for operators
+		  String op1 = null;
+		  String op2 = null;
+		  
+		  // boolean for first operator
+		  boolean firstOp = true;
+		  
+		// initialize operator indexes
+		  int j = 0,i = 0, k = 0,left = 0,middle = 0,right = 0;	  
+
+		  
+		  // count number of operators
+		  for(i=0;i<entry.length();i++)
+		    {
+			for(j=0;j<ops.length;j++)
+			  {
+			  if(entry.charAt(i) == ops[j])
+			    {
+				opCount += 1;  
+				break;
+			    }
+			  }
+		    }
+		  System.out.println("Total number of operators in entry = " + opCount);
+
+	  if(opCount <= 0) // no operators found
+	    {
+		result = entry;
 		return result;
-		}
+	    }
+	  while(opCount > 0) // operators in expression
+	    {
+	    for(j=0;j<ops.length;j++)
+	      { // loop through operators to accomplish "order of operations"
+	  	char desiredOp = ops[j];
+	  	System.out.println("Desired operator on this iteration is: " + desiredOp);
+		    if(!(entry.contains(Character.toString(desiredOp))))
+		    {    
+		    continue;
+		    }
+		    	System.out.println("Entry does indeed contain the desired operator");
+	  	for(i=0;i<entry.length();i++)
+	  	  {
+
+	  		  
+	  	    
+	  	  char A = entry.charAt(i);
+	  	  
+	  	  if((A == '*')||(A == '/')||(A == '+')||(A == '-'))
+	  	    { // an operator has been found, don't know which operator
+	  	    
+	  		if(A != desiredOp)
+	  	      {
+	  	      left = middle;
+	  	      middle = i;
+	  	      System.out.println("Cycling through non op, left = " + left + ", mid = " + middle);
+	  	      if(opCount == 1)
+	  	        {
+	  	    	right = entry.length();
+	  	    	break;
+	  	        }
+	  	      
+	  	      continue;
+	  	      }
+	  		
+	  		else if (A == desiredOp)
+	  		  {
+	  		  left = middle;
+	  		  middle = i;
+	  		  System.out.println("found desired op, left = " + left + ", mid = " + middle);
+	  		 System.out.println("haven't set firstOp yet, = " + firstOp);
+	  		 if(left == 0) firstOp = true;
+	  		  System.out.println("first op affected? = " + firstOp);
+	  		  for(k = i+1;k<entry.length();k++)
+	  		    {
+	  			  char B = entry.charAt(k);
+	  			  if((B == '*')||(B == '/')||(B == '+')||(B == '-'))
+	  			    {
+	  				right = k; // third operator
+	  				System.out.println("expression is: " + entry.substring(left+1,right));
+	  				break;
+	  			    }
+	  		    }
+	  		  
+	  		  // reached end of entry, desiredOp must be last operand in entry
+	  		  right = k;
+	  		  break;
+	  		  }
+	  	
+	  		 
+	  		
+	  	    }
+	  	  }// for loop through entry
+	  	
+	      
+	  	
+	  	// call calculate function and update entry string with answer
+	  	
+	  	if(firstOp)
+	  	  { 
+	  		//System.out.println("getting ready to find op1, desiredOp first op in entry");
+
+	  	    System.out.println("op1" + "     " + entry.substring(0,middle));
+	        op1 = entry.substring(0,middle);
+	        firstOp = false;
+	  	  }
+	  	else if (!firstOp) 
+	  		{
+	  		System.out.println(entry.charAt(left+1));
+	  		System.out.println(entry.charAt(middle));
+	  		System.out.println("getting ready to find op1, desiredOp not first in entry");
+	  		System.out.println("op1" + "       "  +entry.substring(left,middle));
+	  		op1 = entry.substring(left+1,middle);
+	  		}
+	  	System.out.println("getting ready to calculate op2");
+	  	System.out.println("right = " + right);
+	  	System.out.println("op2" + "      " + entry.substring(middle+1,right));
+	  	op2 = entry.substring(middle+1,right);
+	  	opCount-=1;
+	  	String answer = calculate(op1,op2,desiredOp);
+	  	entry = entry.substring(0,left) + answer + entry.substring(right,entry.length());
+	  	left = 0;
+	  	middle = 0;
+	  	right = 0;
+	  	i = 0;
+	  	j = 0;
+	  	k = 0;
+	      }// for loop through ops
+      }
+    result = entry;
+    System.out.println("Final result is: " + result);
+
+	return result;
+	}
 	
 	public String testFunction(String entry)
 		{
@@ -211,18 +356,90 @@ public class Accumulator implements ActionListener
 		return result;
 		}
 	
+	// istance variable for handling negative numbers
+	boolean negative = false;
+	public String calculate(String op1, String op2, char operator)
+	  {
+		String answer = null;
+		  Double result = 0.0;
+		  System.out.println("Getting ready to parse ops to double in calculate()");
+		  Double leftNumber = Double.parseDouble(op1);
+		  Double rightNumber = Double.parseDouble(op2);
+		  System.out.println("leftNumber in calculate() is: " + leftNumber);
+		  System.out.println("rightNumber in calculate() is: " + rightNumber);
+		  switch(operator)
+		    {
+		    case '*' : result = leftNumber * rightNumber; break;
+		    case '/' : result = leftNumber / rightNumber; break;
+		    case '+' : result = leftNumber + rightNumber; break;
+		    case '-' : result = leftNumber - rightNumber; break;	    
+		    }
+		  if(result < 0)
+		    {
+			negative = true;
+			result = result*-1;
+			answer = Double.toString(result);
+			
+		    }
+		  answer = Double.toString(result);
+		  System.out.println("Result of calculate = " + answer);
+		  return answer;
+	  }
+	
 	public boolean containsLetters(String input)
-		{
-	    char[] chars = input.toCharArray();
+	{
+    char[] chars = input.toCharArray();
 
-	    for (char c : chars)
-	    	{
-	        if(Character.isLetter(c))
-	        	{
-	        	return true;
-	        	}
-	    	}
-	    return false;
-		}
+    for (char c : chars)
+    	{
+        if(!(c == '0'))
+        {
+        	if(!(c == '1'))
+	        {
+        		if(!(c == '2'))
+    	        {
+        			if(!(c == '3'))
+        	        {
+        				if(!(c == '4'))
+        		        {
+        					if(!(c == '5'))
+        			        {
+        						if(!(c == '6'))
+        				        {
+        							if(!(c == '7'))
+        					        {
+        								if(!(c == '8'))
+        						        {
+        									if(!(c == '9'))
+        							        {
+        										if(!(c == '.'))
+        								        {
+        											if(!(c == '+'))
+        									        {
+        												if(!(c == '-'))
+        										        {
+        													if(!(c == '*'))
+        											        {
+        														if(!(c == '/'))
+        												        {
+        												        	return true;
+        												        }
+        											        }
+        										        }
+        									        }
+        								        }
+        							        }
+        						        }
+        					        }
+        				        }
+        			        }
+        		        }
+        	        }
+    	        }
+	        }
+        }
+    	}
+    return false;
+	}
 	
 }
