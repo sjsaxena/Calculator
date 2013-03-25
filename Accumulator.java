@@ -202,35 +202,44 @@ public class Accumulator implements ActionListener
 	  {
 	  String result = "";
 	  
-	// State 0 => no operators found
-		  // State 1 => one operator found
-		  // State 2 => two operators found
-		  // State 3 => at least three operators found
+	  CharSequence negOps[] = {"+-","--"};
+	  CharSequence negOps2[] = {"-","+"};
+	 
+	  for(int x = 0; x < 2;x++){
+		  while(entry.contains(negOps[x])){
+		  entry = entry.replace(negOps[x],negOps2[x]);
+		  }
+		  }
+	
+	  
+          // count our operator occurrences
 		  int opCount = 0;
 		  
 		  // array of acceptable operators
-		  char ops[] = {'*','/','+','-'};
+		  // note 2 arrays for left/right precedence in order of operations
+		  char ops[]  = {'*','+'};
+		  char ops2[] = {'/','-'};
 		  
 		  // operand
-		  char operand = '0';
+		  char desiredOp = '0';
 		  
 		  // variables for operators
 		  String op1 = null;
 		  String op2 = null;
 		  
 		  // boolean for first operator
-		  boolean firstOp = true;
+		 // boolean firstOp = true;
 		  
 		// initialize operator indexes
 		  int j = 0,i = 0, k = 0,left = 0,middle = 0,right = 0;	  
 
 		  
 		  // count number of operators
-		  for(i=0;i<entry.length();i++)
+		  for(i=1;i<entry.length();i++)
 		    {
 			for(j=0;j<ops.length;j++)
 			  {
-			  if(entry.charAt(i) == ops[j])
+			  if((entry.charAt(i) == ops[j])||(entry.charAt(i) == ops2[j]))
 			    {
 				opCount += 1;  
 				break;
@@ -246,16 +255,42 @@ public class Accumulator implements ActionListener
 	    }
 	  while(opCount > 0) // operators in expression
 	    {
+		
 	    for(j=0;j<ops.length;j++)
 	      { // loop through operators to accomplish "order of operations"
-	  	char desiredOp = ops[j];
-	  	System.out.println("Desired operator on this iteration is: " + desiredOp);
-		    if(!(entry.contains(Character.toString(desiredOp))))
+	    	
+	    	
+	    	for(int x = 0; x < 2;x++){
+	    		while(entry.contains(negOps[x])){
+	    		entry = entry.replace(negOps[x],negOps2[x]);
+	    		}
+	    		}
+	    	
+	    	
+	    	if(opCount==0) break;
+	  	System.out.println("entry is: " + entry);
+	  	System.out.println("op count is currently at: " + opCount);
+	    	char desiredOp1 = ops[j];
+	    	char desiredOp2 = ops2[j];
+	  	System.out.println("Desired operator on this iteration is: " + desiredOp1 + " or " + desiredOp2);
+	  	
+	  	System.out.println("j = " + j);
+	  	System.out.println("opCount = " + opCount);
+	  	
+	 
+	  	
+	  	
+	  	
+	  	
+	  	
+	  	
+	  	
+		    if(!(entry.contains(Character.toString(desiredOp1))||(entry.contains(Character.toString(desiredOp2)))))
 		    {    
 		    continue;
 		    }
 		    	System.out.println("Entry does indeed contain the desired operator");
-	  	for(i=0;i<entry.length();i++)
+	  	for(i=1;i<entry.length();i++)
 	  	  {
 
 	  		  
@@ -265,7 +300,7 @@ public class Accumulator implements ActionListener
 	  	  if((A == '*')||(A == '/')||(A == '+')||(A == '-'))
 	  	    { // an operator has been found, don't know which operator
 	  	    
-	  		if(A != desiredOp)
+	  		if((A != desiredOp1)&&(A != desiredOp2))
 	  	      {
 	  	      left = middle;
 	  	      middle = i;
@@ -279,20 +314,28 @@ public class Accumulator implements ActionListener
 	  	      continue;
 	  	      }
 	  		
-	  		else if (A == desiredOp)
+	  		else if ((A == desiredOp1)||(A == desiredOp2))
 	  		  {
+	  		  desiredOp = A;
+	  		  System.out.println("just found out our desired op is: " + desiredOp);
 	  		  left = middle;
 	  		  middle = i;
+	  		  
 	  		  System.out.println("found desired op, left = " + left + ", mid = " + middle);
-	  		 System.out.println("haven't set firstOp yet, = " + firstOp);
-	  		 if(left == 0) firstOp = true;
-	  		  System.out.println("first op affected? = " + firstOp);
+	  		// System.out.println("haven't set firstOp yet, = " + firstOp);
+	  		 //if(left == 0) firstOp = true;
+	  		 // System.out.println("first op affected? = " + firstOp);
 	  		  for(k = i+1;k<entry.length();k++)
 	  		    {
 	  			  char B = entry.charAt(k);
 	  			  if((B == '*')||(B == '/')||(B == '+')||(B == '-'))
 	  			    {
+	  				if((k-middle)==1){
+	  					opCount--;
+	  					continue;
+	  				}
 	  				right = k; // third operator
+	  				
 	  				System.out.println("expression is: " + entry.substring(left+1,right));
 	  				break;
 	  			    }
@@ -312,34 +355,47 @@ public class Accumulator implements ActionListener
 	  	
 	  	// call calculate function and update entry string with answer
 	  	
-	  	if(firstOp)
+	  	if(left==0)
 	  	  { 
 	  		//System.out.println("getting ready to find op1, desiredOp first op in entry");
 
 	  	    System.out.println("op1" + "     " + entry.substring(0,middle));
 	        op1 = entry.substring(0,middle);
-	        firstOp = false;
+	        //firstOp = false;
 	  	  }
-	  	else if (!firstOp) 
+	  	else 
 	  		{
 	  		System.out.println(entry.charAt(left+1));
 	  		System.out.println(entry.charAt(middle));
 	  		System.out.println("getting ready to find op1, desiredOp not first in entry");
-	  		System.out.println("op1" + "       "  +entry.substring(left,middle));
+	  		System.out.println("op1" + "       "  +entry.substring(left+1,middle));
 	  		op1 = entry.substring(left+1,middle);
 	  		}
 	  	System.out.println("getting ready to calculate op2");
 	  	System.out.println("right = " + right);
 	  	System.out.println("op2" + "      " + entry.substring(middle+1,right));
 	  	op2 = entry.substring(middle+1,right);
-	  	opCount-=1;
+	  	System.out.println("opCount before decrement = " + opCount);
+	  	
+	  	opCount--;
+        System.out.println("opCount after decrement now  = " + opCount);
 	  	String answer = calculate(op1,op2,desiredOp);
-	  	entry = entry.substring(0,left) + answer + entry.substring(right,entry.length());
+
+	  	if(left==0)
+	  	{
+	  	entry = entry.substring(0,left) + answer + entry.substring(right,entry.length());	
+	  	}
+	  	else{
+	  	entry = entry.substring(0,left+1) + answer + entry.substring(right,entry.length());
+	  	}
+	  	
+	  	
+	  	
 	  	left = 0;
 	  	middle = 0;
 	  	right = 0;
 	  	i = 0;
-	  	j = 0;
+	  	j = -1;
 	  	k = 0;
 	      }// for loop through ops
       }
@@ -363,6 +419,7 @@ public class Accumulator implements ActionListener
 		String answer = null;
 		  Double result = 0.0;
 		  System.out.println("Getting ready to parse ops to double in calculate()");
+		  System.out.println("Our current desired operator is: " + operator);
 		  Double leftNumber = Double.parseDouble(op1);
 		  Double rightNumber = Double.parseDouble(op2);
 		  System.out.println("leftNumber in calculate() is: " + leftNumber);
@@ -374,13 +431,13 @@ public class Accumulator implements ActionListener
 		    case '+' : result = leftNumber + rightNumber; break;
 		    case '-' : result = leftNumber - rightNumber; break;	    
 		    }
-		  if(result < 0)
+		/*  if(result < 0)
 		    {
 			negative = true;
 			result = result*-1;
 			answer = Double.toString(result);
 			
-		    }
+		    }*/
 		  answer = Double.toString(result);
 		  System.out.println("Result of calculate = " + answer);
 		  return answer;
