@@ -406,11 +406,24 @@ public class Accumulator implements ActionListener
 	}
 	
 	public String testFunction(String entry)
-		{
-		String result = "lolcatz";
-		
-		return result;
-		}
+	{
+	String result = "lolcatz";
+	int i = entry.indexOf("=");
+	String left = entry.substring(0,i);
+	String right = entry.substring(i+1,entry.length());
+	System.out.println("*******LEFT = " + left);
+	System.out.println("*******RIGHT = " + right);
+	left = calculatorFunction(entry.substring(0,i));
+	right = calculatorFunction(entry.substring(i+1,entry.length()));
+	if(left.equals(right)){
+	result = "CORRECT!";
+	System.out.println("got here");
+	}
+	else{
+	result = "OOPS!";
+	}
+	return result;
+	}
 	
 	// istance variable for handling negative numbers
 	boolean negative = false;
@@ -479,8 +492,11 @@ public class Accumulator implements ActionListener
         											        {
         														if(!(c == '/'))
         												        {
+        															if(!(c == '='))
+        															{
         												        	return true;
-        												        }
+        															}
+        														}
         											        }
         										        }
         									        }
