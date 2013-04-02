@@ -4,18 +4,19 @@
  * Travis Tippens tctippen
  * Shreye Saxena sjsaxena
  */
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.util.Stack;
 
-public class Accumulator implements ActionListener
+public class Calculator implements ActionListener
 {
 	// Main - loads program object
 	public static void main(String[] args){
 		System.out.println("Team 8: Michael Glander, Travis Tippens, Shreye Saxena");
-		new Accumulator();
+		new Calculator();
 		}
 	
 	
@@ -26,12 +27,14 @@ public class Accumulator implements ActionListener
 	private JFrame window = new JFrame("Calculator");
 	private JTextField inputTextField = new JTextField(20);
 	private JTextField outputTextField = new JTextField(20);
-	private JTextField precisionTextField = new JTextField(20); 
+	private JTextField precisionTextField = new JTextField(5); 
+	private JTextField xTextField = new JTextField(15);
 	private JTextArea logTextArea = new JTextArea();
 	private JScrollPane logScrollPane = new JScrollPane(logTextArea);
 	private JLabel inputLabel = new JLabel("Enter input");
 	private JLabel outputLabel = new JLabel(" Result -> ");
 	private JLabel errorLabel = new JLabel("");
+	private JButton xButton = new JButton("Update X = ");
 	private JButton precisionButton = new JButton("Update Precision:");
 	private JButton clearButton = new JButton("Clear");
 	private JButton recallButton = new JButton("Prev");
@@ -43,7 +46,7 @@ public class Accumulator implements ActionListener
 	private ButtonGroup bGroup = new ButtonGroup();
 	private JPanel bottomPanel = new JPanel();
 	
-	public Accumulator()
+	public Calculator()
 		{
 		// -------------------------------------			
 		// ----------- BUILD GUI ---------------
@@ -75,6 +78,8 @@ public class Accumulator implements ActionListener
 		bottomPanel.add(testMode);
 		bottomPanel.add(precisionButton);
 		bottomPanel.add(precisionTextField);
+		bottomPanel.add(xButton);
+		bottomPanel.add(xTextField);
 		bottomPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mode Select"));
 		
 		window.getContentPane().add(topPanel, "North");
@@ -93,10 +98,12 @@ public class Accumulator implements ActionListener
 		inputTextField.setEditable(true);
 		outputTextField.setEditable(false);
 		window.setLocation(10, 10); // horizontal, vertical
-		window.setSize(800, 500); // width,height in pixels
+		window.setSize(1000, 500); // width,height in pixels
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    window.setVisible(true);
 	    logTextArea.setText(""); //  clear log
+	    precisionTextField.setText("2");
+	    xTextField.setText("0.00");
 		
 		// Set event notification
 		inputTextField.addActionListener(this);
@@ -106,12 +113,14 @@ public class Accumulator implements ActionListener
 		accumulatorMode.addActionListener(this);
 		calculatorMode.addActionListener(this);
 		testMode.addActionListener(this);
+		xButton.addActionListener(this);
 		
 		
 		}
 
 	String mode = "accumulator";
 	int precision = 2; 
+	double userX = 0.00;
 	Stack<String> expressionLIFO = new Stack<String>();
 	
 	public void actionPerformed(ActionEvent ae)
@@ -128,6 +137,8 @@ public class Accumulator implements ActionListener
 			// input is received
 			input = inputTextField.getText().trim();
 			input = input.replace(" ", "");
+			input = input.toLowerCase();
+			
 			if(input.length() == 0)
 				{
 				errorLabel.setText("Please enter a value");
@@ -138,7 +149,17 @@ public class Accumulator implements ActionListener
 			// and does not contain multiple operators in a row
 			if(containsLetters(input))
 				{
-				errorLabel.setText("Input can only be comprised of numbers and operators");
+				errorLabel.setText("Input can only be comprised of numbers, operators, e, pi, or x");
+				return;
+				}
+			if((input.contains("p") && !(input.contains("pi"))) || (input.contains("i") && !(input.contains("pi"))))
+				{
+				errorLabel.setText("Input can only be comprised of numbers, operators, e, pi, or x");
+				return;
+				}
+			if(input.contains("pp") || input.contains("ii") || input.contains("ee") || input.contains("xx") || input.contains("pipi"))
+				{
+				errorLabel.setText("Substituted values must precede or follow an operator");
 				return;
 				}
 			if( input.startsWith("*") || input.startsWith("/") || input.endsWith("*") || input.endsWith("/") || input.endsWith("+") || input.endsWith("-"))
@@ -155,10 +176,11 @@ public class Accumulator implements ActionListener
 			// -------------------------------------			
 			// -------- PROCESSING INPUT -----------
 			// -------------------------------------
-			
+			String displayInput = "input";
 			// ACCUMULATOR MODE
 			if(mode.equals("accumulator"))
 				{
+				
 				// input cannot contain * or /, and can only use + or - to indicate sign
 				if(input.contains("*") || input.contains("/"))
 					{
@@ -184,12 +206,31 @@ public class Accumulator implements ActionListener
 						}
 					}
 				
+				
 				// process accumulator
 				Double previousTotal = runningTotal;
 				expressionLIFO.push(input);
+				
+				boolean usesX = false;
+				displayInput = input;
+				if(input.contains("e"))
+					input = input.replace("e", Double.toString(Math.E));
+				
+				if(input.contains("pi"))
+					input = input.replace("pi", Double.toString(Math.PI));
+				
+				if(input.contains("x")){
+					input = input.replace("x", Double.toString(userX));
+					usesX = true;
+				}
+				
 				result = accumulatorFunction(input);
 				outputTextField.setText(result);
-				logEntry = Double.toString(previousTotal) + " + " + input + " = " + result + newLine;
+				logEntry = Double.toString(previousTotal) + " + " + displayInput + " = " + result;
+				if(usesX){
+					logEntry = logEntry + " for x = " +  (new BigDecimal(userX).setScale(precision, BigDecimal.ROUND_HALF_UP)).toString();
+				}
+				logEntry = logEntry + newLine;
 				logTextArea.append(logEntry);
 				inputTextField.setText("");
 				} 
@@ -197,6 +238,7 @@ public class Accumulator implements ActionListener
 			// CALCULATOR MODE
 			if(mode.equals("calculator"))
 				{
+					
 				// input cannot contain =
 				if(input.contains("="))
 					{
@@ -204,27 +246,70 @@ public class Accumulator implements ActionListener
 					return;
 					}
 				
+				
 				//process calculator
 				expressionLIFO.push(input);
+				
+				boolean usesX = false;
+				displayInput = input;
+				if(input.contains("e"))
+					input = input.replace("e", Double.toString(Math.E));
+				
+				if(input.contains("pi"))
+					input = input.replace("pi", Double.toString(Math.PI));
+				
+				if(input.contains("x")){
+					input = input.replace("x", Double.toString(userX));
+					usesX = true;
+				}
+				
 				result = calculatorFunction(input);
-				logEntry = input + " = " + result + newLine;
+				logEntry = displayInput + " = " + result;
+				if(usesX){
+					logEntry = logEntry + " for x = " +  (new BigDecimal(userX).setScale(precision, BigDecimal.ROUND_HALF_UP)).toString();
+				}
+				logEntry = logEntry + newLine;
 				logTextArea.append(logEntry);
 				outputTextField.setText(result);
+				inputTextField.setText("");
 				}
 			
 			// TEST MODE
 			if(mode.equals("test"))
 				{
+				
+				
 				if(input.indexOf("=") != input.lastIndexOf("="))
 					{
 					errorLabel.setText("You can only have one = sign in the expression!");
 					return;
 					}
+				
+				
 				expressionLIFO.push(input);
+				
+				boolean usesX = false;
+				displayInput = input;
+				if(input.contains("e"))
+					input = input.replace("e", Double.toString(Math.E));
+				
+				if(input.contains("pi"))
+					input = input.replace("pi", Double.toString(Math.PI));
+				
+				if(input.contains("x")){
+					input = input.replace("x", Double.toString(userX));
+					usesX = true;
+				}
+				
 				result = testFunction(input);
-				logEntry = result + newLine;
+				logEntry = result;
+				if(usesX){
+					logEntry = logEntry + " for x = " + (new BigDecimal(userX).setScale(precision, BigDecimal.ROUND_HALF_UP)).toString();
+				}
+				logEntry = logEntry + newLine;
 				logTextArea.append(logEntry);
 				outputTextField.setText(logEntry);
+				//inputTextField.setText("");
 				}
 				
 			} 
@@ -238,6 +323,18 @@ public class Accumulator implements ActionListener
 			outputTextField.setText("");
 			runningTotal = 0.00;
 			inputTextField.requestFocus();
+			}
+		
+		if(ae.getSource() == xButton)
+			{
+			try{
+				userX = Double.parseDouble(xTextField.getText());
+				errorLabel.setText("");
+				inputTextField.requestFocus();
+			} catch(NumberFormatException nfe)
+				{
+				errorLabel.setText("Your X value is not valid.");
+				}
 			}
 		
 		// If a mode radio button is pressed, clear the fields and set the mode
@@ -269,6 +366,7 @@ public class Accumulator implements ActionListener
 				{
 				inputTextField.setText(expressionLIFO.pop());
 				}
+			inputTextField.requestFocus();
 			}
 		
 		if(ae.getSource() == precisionButton)
@@ -607,10 +705,22 @@ public class Accumulator implements ActionListener
 	        											        {
 	        														if(!(c == '/'))
 	        												        {
-	        															if(!(c == '='))
-		        												        {
-		        												        	return true;
-		        												        }
+	        															if(!(c == 'e'))
+	        															{
+	        																if(!(c == 'p'))
+	        																{
+	        																	if(!(c == 'i'))
+	        																	{
+	        																		if(!(c == 'x'))
+	        																		{
+					        															if(!(c == '='))
+						        												        {
+						        												        	return true;
+						        												        }
+	        																		}
+	        																	}
+	        																}
+	        												        	}
 	        												        }
 	        											        }
 	        										        }
