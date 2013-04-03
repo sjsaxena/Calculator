@@ -172,6 +172,16 @@ public class Calculator implements ActionListener
 				errorLabel.setText("You have multiple operators in a row!");
 				return;
 				}
+			if(numberOf('(', input) != numberOf(')', input))
+				{
+				errorLabel.setText("Must have an equal number of ( and )");
+				return;
+				}
+			if( (input.indexOf(')') < input.indexOf('(')) && input.contains("("))
+				{
+				errorLabel.setText("Check your parentheses");
+				return;
+				}
 			
 			// -------------------------------------			
 			// -------- PROCESSING INPUT -----------
@@ -405,8 +415,67 @@ public class Calculator implements ActionListener
 		return result;
 		}
 	
-	//CALCULATOR IMPLEMENTATION
 	public String calculatorFunction(String entry)
+	  {
+		String result = "";
+		String subEntry = "";
+		Double temp = 0.00;
+	  int openBrace=0,closeBrace=0;
+	  int i=0,j=0;
+	  boolean closed = false;
+	  
+	  while(entry.contains("("))
+	    {
+		//parentheses stuff
+		for(i=0;i<entry.length();i++)
+		  {
+		  if((entry.charAt(i)=='('))
+		    {
+			openBrace = i;
+			
+			for(j=i+1;j<entry.length();j++)
+			  {
+			  if(entry.charAt(j)=='(')
+			    {
+				openBrace = j;
+				System.out.println("openBrace: " + openBrace);
+				i=j;
+				continue;
+			    }
+			  if(entry.charAt(j)==')')
+			    {
+				closeBrace = j;
+				System.out.println("closeBrace: " + closeBrace);
+				closed = true;
+				break;
+			    }
+			  }//for j
+
+		    } // if
+			if(closed)
+			  {
+			  closed = false;
+			  break;
+			  }  
+		  }//for i
+		//System.out.println("openBrace: " + openBrace);
+		//System.out.println("closeBrace: " + closeBrace);
+		subEntry = entry.substring(openBrace+1,closeBrace);
+		subEntry = calculateParentheses(subEntry);
+		entry = entry.substring(0,openBrace) + subEntry + entry.substring(closeBrace+1,entry.length());
+		//System.out.println("entry: " + entry);
+		
+	    }//while parentheses
+	  result = calculateParentheses(entry);
+	  //rounding
+	  temp = Double.parseDouble(result);
+	  BigDecimal bd = new BigDecimal(temp).setScale(precision, BigDecimal.ROUND_HALF_UP);
+	  result = bd.toString();
+	  return result;
+	  }
+	
+	//CALCULATOR IMPLEMENTATION
+	public String calculateParentheses(String entry)
 	  {
 	  String result = "";
 
@@ -425,8 +494,8 @@ public class Calculator implements ActionListener
 
 		  // array of acceptable operators
 		  // note 2 arrays for left/right precedence in order of operations
-		  char ops[]  = {'*','+'};
-		  char ops2[] = {'/','-'};
+		  char ops[]  = {'^','*','+'};
+		  char ops2[] = {'r','/','-'};
 
 		  // operand
 		  char desiredOp = '0';
@@ -459,9 +528,6 @@ public class Calculator implements ActionListener
 	  if(opCount <= 0) // no operators found
 	    {
 		result = entry;
-		Double temp =Double.parseDouble(result);
-	  	BigDecimal bd = new BigDecimal(temp).setScale(precision, BigDecimal.ROUND_HALF_UP);
-	  	result = bd.toString();
 		return result;
 	    }
 	  while(opCount > 0) // operators in expression
@@ -508,7 +574,7 @@ public class Calculator implements ActionListener
 
 	  	  char A = entry.charAt(i);
 
-	  	  if((A == '*')||(A == '/')||(A == '+')||(A == '-'))
+	  	  if((A == '^')||(A == 'r')||(A == '*')||(A == '/')||(A == '+')||(A == '-'))
 	  	    { // an operator has been found, don't know which operator
 
 	  		if((A != desiredOp1)&&(A != desiredOp2))
@@ -539,7 +605,7 @@ public class Calculator implements ActionListener
 	  		  for(k = i+1;k<entry.length();k++)
 	  		    {
 	  			  char B = entry.charAt(k);
-	  			  if((B == '*')||(B == '/')||(B == '+')||(B == '-'))
+	  			  if((B == '^')||(B == 'r')||(B == '*')||(B == '/')||(B == '+')||(B == '-'))
 	  			    {
 	  				if((k-middle)==1){
 	  					opCount--;
@@ -612,9 +678,6 @@ public class Calculator implements ActionListener
     }
   result = entry;
   // System.out.println("Final result is: " + result);
-  	Double temp =Double.parseDouble(result);
-  	BigDecimal bd = new BigDecimal(temp).setScale(precision, BigDecimal.ROUND_HALF_UP);
-	result = bd.toString();
 	return result;
 	}
 
@@ -655,7 +718,9 @@ public class Calculator implements ActionListener
 		    case '*' : result = leftNumber * rightNumber; break;
 		    case '/' : result = leftNumber / rightNumber; break;
 		    case '+' : result = leftNumber + rightNumber; break;
-		    case '-' : result = leftNumber - rightNumber; break;	    
+		    case '-' : result = leftNumber - rightNumber; break;
+		    case '^' : result = Math.pow(leftNumber, rightNumber); break;
+		    case 'r' : result = Math.pow(leftNumber, (1/rightNumber)); break;
 		    }
 		/*  if(result < 0)
 		    {
@@ -697,6 +762,11 @@ public class Calculator implements ActionListener
 	        							        {
 	        										if(!(c == '.'))
 	        								        {
+	        											if(!(c == '('))
+		        								        {
+	        												if(!(c == ')'))
+	    	        								        {
+		        								        
 	        											if(!(c == '+'))
 	        									        {
 	        												if(!(c == '-'))
@@ -715,7 +785,16 @@ public class Calculator implements ActionListener
 	        																		{
 					        															if(!(c == '='))
 						        												        {
+					        																if(!(c == '^'))
+							        												        {
+					        																	if(!(c == 'r'))
+								        												        {
+							        												        
 						        												        	return true;
+								        												        }
+							        												           }
+						        												             }
+							        												       }
 						        												        }
 	        																		}
 	        																	}
@@ -739,5 +818,20 @@ public class Calculator implements ActionListener
 	    	}
 	    return false;
 		}
+	
+	int numberOf(char test, String entry)
+		{
+		int i;
+		int count = 0;
+		for(i=0;i<entry.length();i++)
+			{
+			if(entry.charAt(i) == test)
+				{
+				count++;
+				}
+			}
+		return count;
+		}
+	
 	
 }
