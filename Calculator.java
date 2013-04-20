@@ -27,18 +27,24 @@ public class Calculator implements ActionListener
 	//GUI Objects
 	private JFrame window = new JFrame("Calculator");
 	private JTextField inputTextField = new JTextField(20);
-	private JTextField outputTextField = new JTextField(20);
+	private JTextField outputTextField = new JTextField(10);
 	private JTextField precisionTextField = new JTextField(5); 
+	private JTextField highXTextField = new JTextField(5);
+	private JTextField lowXTextField = new JTextField(5);
+	private JTextField incrementXTextField = new JTextField(5);
 	private JTextField xTextField = new JTextField(15);
 	private JTextArea logTextArea = new JTextArea();
 	private JScrollPane logScrollPane = new JScrollPane(logTextArea);
 	private JLabel inputLabel = new JLabel("Enter input");
 	private JLabel outputLabel = new JLabel(" Result -> ");
 	private JLabel errorLabel = new JLabel("");
+	private JLabel xRangeLabel = new JLabel("    low X          high X     X increment");
 	private JButton xButton = new JButton("Update X = ");
+	private JButton xRangeButton = new JButton("Update X Range");
 	private JButton precisionButton = new JButton("Update Precision:");
 	private JButton clearButton = new JButton("Clear");
-	private JButton recallButton = new JButton("Prev");
+	private JButton recallButton = new JButton("Recall");
+	private JButton graphButton = new JButton("Graph!");
 	private JPanel topPanel = new JPanel(new GridBagLayout());
 	GridBagConstraints c = new GridBagConstraints();
 	private JRadioButton accumulatorMode = new JRadioButton("Accumulator", true);
@@ -46,6 +52,7 @@ public class Calculator implements ActionListener
 	private JRadioButton testMode = new JRadioButton("Test Mode", false);
 	private ButtonGroup bGroup = new ButtonGroup();
 	private JPanel bottomPanel = new JPanel();
+	private boolean xRangeIsOkay = false;
 	
 	public Calculator()
 		{
@@ -68,10 +75,21 @@ public class Calculator implements ActionListener
 		topPanel.add(outputTextField, c);
 		c.gridx = 5;
 		topPanel.add(clearButton, c);	
-		c.gridwidth = 6;
+		c.gridx = 6;
+		topPanel.add(lowXTextField,c);
+		c.gridx = 7;
+		topPanel.add(highXTextField,c);
+		c.gridx = 8;
+		topPanel.add(incrementXTextField,c);
+		c.gridx = 9;
+		topPanel.add(xRangeButton,c);
+		c.gridwidth = 10;
 		c.gridx = 0;
 		c.gridy = 1;
 		topPanel.add(errorLabel,c);
+		c.gridx = 6;
+		topPanel.add(xRangeLabel,c);
+		
 		
 		bottomPanel.setLayout(new GridLayout(1,3));
 		bottomPanel.add(accumulatorMode);
@@ -83,6 +101,7 @@ public class Calculator implements ActionListener
 		bottomPanel.add(xTextField);
 		bottomPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mode Select"));
 		
+		
 		window.getContentPane().add(topPanel, "North");
 		window.getContentPane().add(logScrollPane, "Center");
 		window.getContentPane().add(bottomPanel, "South");
@@ -93,13 +112,13 @@ public class Calculator implements ActionListener
 		bGroup.add(testMode);
 		logTextArea.setEditable(false);
 		logTextArea.setFont(new Font("default", Font.BOLD, 20));
-		clearButton.setBackground((Color.black));
-		clearButton.setForeground(Color.yellow);
-		errorLabel.setForeground(Color.red);
+		clearButton.setBackground((Color.BLACK));
+		clearButton.setForeground(Color.YELLOW);
+		errorLabel.setForeground(Color.RED);
 		inputTextField.setEditable(true);
 		outputTextField.setEditable(false);
 		window.setLocation(10, 10); // horizontal, vertical
-		window.setSize(1000, 500); // width,height in pixels
+		window.setSize(1400, 500); // width,height in pixels
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    window.setVisible(true);
 	    logTextArea.setText(""); //  clear log
@@ -115,7 +134,8 @@ public class Calculator implements ActionListener
 		calculatorMode.addActionListener(this);
 		testMode.addActionListener(this);
 		xButton.addActionListener(this);
-		
+		graphButton.addActionListener(this);
+		xRangeButton.addActionListener(this);
 		
 		}
 
@@ -163,7 +183,7 @@ public class Calculator implements ActionListener
 				errorLabel.setText("Substituted values must precede or follow an operator");
 				return;
 				}
-			if( input.startsWith("*") || input.startsWith("/") || input.endsWith("*") || input.endsWith("/") || input.endsWith("+") || input.endsWith("-"))
+			if( input.startsWith("*") || input.startsWith("/") || input.endsWith("*") || input.endsWith("/") || input.endsWith("+") || input.endsWith("-") || input.startsWith("+"))
 				{
 				errorLabel.setText("Cannot begin or end expression with an operator");
 				return;
@@ -181,6 +201,26 @@ public class Calculator implements ActionListener
 			if( (input.indexOf(')') < input.indexOf('(')) && input.contains("("))
 				{
 				errorLabel.setText("Check your parentheses");
+				return;
+				}
+			if( (input.contains("+)")) || (input.contains("*)")) || (input.contains("/)")) || (input.contains("r)")) || (input.contains("^)")))
+				{
+				errorLabel.setText("Check your operators and parentheses!");
+				return;
+				}
+			if( (input.contains("(+")) || (input.contains("(*")) || (input.contains("(/")) || (input.contains("(r")) || (input.contains("(^")))
+				{
+				errorLabel.setText("Check your operators and parentheses!");
+				return;
+				}
+			if(input.contains("0(")||input.contains("1(")||input.contains("2(")||input.contains("3(")||input.contains("4(")||input.contains("5(")||input.contains("6(")||input.contains("7(")||input.contains("8(")||input.contains("9("))
+				{
+				errorLabel.setText("No implicit operations alloweD!");
+				return;
+				}
+			if(input.contains(")0")||input.contains(")1")||input.contains(")2")||input.contains(")3")||input.contains(")4")||input.contains(")5")||input.contains(")6")||input.contains(")7")||input.contains(")8")||input.contains(")9")||input.contains(")("))
+				{
+				errorLabel.setText("No implicit operations allowed!");
 				return;
 				}
 			
@@ -401,6 +441,46 @@ public class Calculator implements ActionListener
 				{
 				errorLabel.setText("Precision must be a positive integer");
 				}
+			}
+		
+		if(ae.getSource() == xRangeButton)
+			{
+			double lowX = -10;
+			double highX = 10;
+			double incrementX = 1;
+			try
+				{
+				lowX = Double.parseDouble(lowXTextField.getText());
+				highX = Double.parseDouble(highXTextField.getText());
+				incrementX = Double.parseDouble(incrementXTextField.getText());
+				}
+			catch(Exception e)
+				{
+				errorLabel.setText("Please make sure that you have input valid numerical values");
+				xRangeIsOkay = false;
+				return;
+				}
+			if((highX<lowX)||((5*incrementX) > (highX-lowX))||((20*incrementX)<(highX-lowX))||(incrementX<=0))
+				{
+				errorLabel.setText("Please fix your graph scale and increment to display 5-20 points");
+				xRangeIsOkay = false;
+				return;
+				}
+			xRangeIsOkay = true;
+			}
+		
+		if(ae.getSource() == graphButton)
+			{
+			errorLabel.setText("");
+			if(xRangeIsOkay)
+				{
+				// prepareGraphData
+				// calculate X range
+				// create Grapher object
+					// pass X values, Y values, X range, X increment, and address of Calculator object (this)
+				}
+			else
+				errorLabel.setText("Please set your range first!");
 			}
 		
 		}
