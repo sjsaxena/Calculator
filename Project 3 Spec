@@ -1,0 +1,50 @@
+Display graph of an expression over a range of x values
+
+Add fields...
+for X, to X, increment
+Set initial value of "increment" to 1
+
+User defines EITHER toX OR increments. Always show 10 increments of x
+
+Show 5-20 points on plot in the set x-range
+
+	 - toX should be greater than increment
+	 - difference should be big enough to plot a few points
+	 - "too many" graph points should not be allowed
+	 	(-100 to 100 by 1)
+
+Allow a max of 20 X-scale values
+	 	- JUST ASK USER TO ADJUST THESE
+
+We have to decide on Y-scale values. 
+	Probably wont be one-toone with X scale tick marks or with the Y expression values. Show as many as X scale are being shown?
+
+have a prepareGraphData() method that calls evaluate() in a loop to create two arrays of double for X and Y values for plotting. 
+
+Write a separate program to do graphing, that takes data points and window points. Creates a new window for each graph.
+
+	- Graphing program figures out Y scale and tick marks...
+
+	- extend JPanel and provide a paint() method
+		public void paint(Graphics g)
+			{
+			}	
+
+		Do ALL graph drawing by calling methods on g in the paint() method
+
+		In the constructor, add "this" to "Center" of the graphWindow. 
+
+		When you call graphWindow.setVisible(true) at the bottom of constructor, the window will call the paint() method on its components.
+
+		When the user resizes a window, the window calls the paint() method of all compnents.
+
+		Recalculate the size of the screen and replot everything relative to that size
+
+Calculator should load a new copy of Grapher for each graph that is requested
+
+
+
+Add a "What is the value at this point?" feature.
+	- user can click the poinse and a window will pop up at the point and display what the x and y values are for the expression. 
+
+	- call evaluate() back in Calculator program.. look at the spec.
