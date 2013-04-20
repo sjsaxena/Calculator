@@ -448,6 +448,7 @@ public class Calculator implements ActionListener
 			double lowX = -10;
 			double highX = 10;
 			double incrementX = 1;
+			errorLabel.setText("");
 			try
 				{
 				lowX = Double.parseDouble(lowXTextField.getText());
