@@ -6,7 +6,6 @@
  */
 
 import java.awt.*;
-import java.awt.List;
 import java.awt.event.*;
 import javax.swing.*;
 import java.math.BigDecimal;
@@ -14,7 +13,7 @@ import java.util.*;
 
 public class Calculator implements ActionListener
 {
-  // Main - loads program object
+	// Main - loads program object
 	public static void main(String[] args){
 		System.out.println("Team 8: Michael Glander, Travis Tippens, Shreye Saxena");
 		new Calculator();
@@ -146,6 +145,9 @@ public class Calculator implements ActionListener
 	double userX = 0.00;
 	Stack<String> expressionLIFO = new Stack<String>();
 	boolean usesX = false;
+	Double lowX = 0.00;
+	Double highX = 0.00;
+	Double incrementX = 0.00;
 	
 	public void actionPerformed(ActionEvent ae)
 		{
@@ -441,9 +443,6 @@ public class Calculator implements ActionListener
 		
 		if(ae.getSource() == xRangeButton)
 			{
-			double lowX = -10;
-			double highX = 10;
-			double incrementX = 1;
 			errorLabel.setText("");
 			try
 				{
@@ -469,10 +468,82 @@ public class Calculator implements ActionListener
 		if(ae.getSource() == graphButton)
 			{
 			errorLabel.setText("");
+			
+			// input is received
+						input = inputTextField.getText().trim();
+						input = input.replace(" ", "");
+						input = input.toLowerCase();
+						
+						if(input.length() == 0)
+							{
+							errorLabel.setText("Please enter a value");
+							return;
+							}
+						// check to make sure input is comprised of numbers and operators,
+						// does not begin or end with an operator,
+						// and does not contain multiple operators in a row
+						if(containsLetters(input))
+							{
+							errorLabel.setText("Input can only be comprised of numbers, operators, e, pi, or x");
+							return;
+							}
+						if((input.contains("p") && !(input.contains("pi"))) || (input.contains("i") && !(input.contains("pi"))))
+							{
+							errorLabel.setText("Input can only be comprised of numbers, operators, e, pi, or x");
+							return;
+							}
+						if(input.contains("pp") || input.contains("ii") || input.contains("ee") || input.contains("xx") || input.contains("pipi"))
+							{
+							errorLabel.setText("Substituted values must precede or follow an operator");
+							return;
+							}
+						if( input.startsWith("*") || input.startsWith("/") || input.endsWith("*") || input.endsWith("/") || input.endsWith("+") || input.endsWith("-") || input.startsWith("+"))
+							{
+							errorLabel.setText("Cannot begin or end expression with an operator");
+							return;
+							}
+						if(input.contains("++") || input.contains("---") || input.contains("**") || input.contains("//")||input.contains("+*")||input.contains("-*")||input.contains("+/")||input.contains("-/"))
+							{
+							errorLabel.setText("You have multiple operators in a row!");
+							return;
+							}
+						if(numberOf('(', input) != numberOf(')', input))
+							{
+							errorLabel.setText("Must have an equal number of ( and )");
+							return;
+							}
+						if( (input.indexOf(')') < input.indexOf('(')) && input.contains("("))
+							{
+							errorLabel.setText("Check your parentheses");
+							return;
+							}
+						if( (input.contains("+)")) || (input.contains("*)")) || (input.contains("/)")) || (input.contains("r)")) || (input.contains("^)")))
+							{
+							errorLabel.setText("Check your operators and parentheses!");
+							return;
+							}
+						if( (input.contains("(+")) || (input.contains("(*")) || (input.contains("(/")) || (input.contains("(r")) || (input.contains("(^")))
+							{
+							errorLabel.setText("Check your operators and parentheses!");
+							return;
+							}
+						if(input.contains("0(")||input.contains("1(")||input.contains("2(")||input.contains("3(")||input.contains("4(")||input.contains("5(")||input.contains("6(")||input.contains("7(")||input.contains("8(")||input.contains("9("))
+							{
+							errorLabel.setText("No implicit operations alloweD!");
+							return;
+							}
+						if(input.contains(")0")||input.contains(")1")||input.contains(")2")||input.contains(")3")||input.contains(")4")||input.contains(")5")||input.contains(")6")||input.contains(")7")||input.contains(")8")||input.contains(")9")||input.contains(")("))
+							{
+							errorLabel.setText("No implicit operations allowed!");
+							return;
+							}
+			
+			
 			if(mode.equals("calculator")) {
 				if(xRangeIsOkay)
 				  {
-				  // prepareGraphData(
+				  System.out.println("Input is: " + input);
+				  prepareGraph(input);
 				  // 
 				  // create Grapher object
 				    // pass X values, Y values, X range, X increment, and address of Calculator object (this)
@@ -496,7 +567,7 @@ public class Calculator implements ActionListener
 		return result;
 		}
 	
-	public String calculatorFunction(String entry)
+	public synchronized String calculatorFunction(String entry)
 	  {
 		String result = "";
 		String subEntry = "";
@@ -559,7 +630,7 @@ public class Calculator implements ActionListener
 	public String calculateParentheses(String entry)
 	  {
 	  String result = "";
-	  
+	  System.out.println("entry received is: " + entry);
 	  if(entry.contains("x")){
 			entry = entry.replace("x", Double.toString(userX));
 			usesX = true;
@@ -683,6 +754,7 @@ public class Calculator implements ActionListener
 	  		  // System.out.println("just found out our desired op is: " + desiredOp);
 	  		  left = middle;
 	  		  middle = i;
+	  		  
 
 	  		  // System.out.println("found desired op, left = " + left + ", mid = " + middle);
 	  		// // System.out.println("haven't set firstOp yet, = " + firstOp);
@@ -698,14 +770,34 @@ public class Calculator implements ActionListener
 	  					continue;
 	  				}
 	  				right = k; // third operator
+	  				
+	  				
 
 	  				// System.out.println("expression is: " + entry.substring(left+1,right));
 	  				break;
 	  			    }
+	  			  
 	  		    }
+	  		  
+	  		  
 
 	  		  // reached end of entry, desiredOp must be last operand in entry
 	  		  right = k;
+	  		  
+	  		  if(entry.charAt(left) == '-')
+	  		    {
+	  			if(left > 0){
+	  			System.out.println("Heythere");
+	  			if((entry.charAt(left-1)=='*') || (entry.charAt(left-1)=='/') || (entry.charAt(left-1)=='^') || (entry.charAt(left-1)=='r')) 
+	  				{
+	  				System.out.println("You dun fucked up");
+	  				left--;
+	  				opCount--;
+	  				System.out.println(entry.charAt(left));
+	  				}  
+	  			}
+	  		    }
+	  		  
 	  		  break;
 	  		  }
 
@@ -731,19 +823,19 @@ public class Calculator implements ActionListener
 	  		// System.out.println(entry.charAt(left+1));
 	  		// System.out.println(entry.charAt(middle));
 	  		// System.out.println("getting ready to find op1, desiredOp not first in entry");
-	  		// System.out.println("op1" + "       "  +entry.substring(left+1,middle));
+	  		System.out.println("op1" + "       "  +entry.substring(left+1,middle));
 	  		op1 = entry.substring(left+1,middle);
 	  		}
 	  	// System.out.println("getting ready to calculate op2");
 	  	// System.out.println("right = " + right);
-	  	// System.out.println("op2" + "      " + entry.substring(middle+1,right));
+	  	System.out.println("op2" + "      " + entry.substring(middle+1,right));
 	  	op2 = entry.substring(middle+1,right);
-	  	// System.out.println("opCount before decrement = " + opCount);
+	  	System.out.println("opCount before decrement = " + opCount);
 
 	  	opCount--;
-      // System.out.println("opCount after decrement now  = " + opCount);
+        System.out.println("opCount after decrement now  = " + opCount);
 	  	String answer = calculate(op1,op2,desiredOp);
-
+        System.out.println("Answer: " + answer);
 	  	if(left==0)
 	  	{
 	  	entry = entry.substring(0,left) + answer + entry.substring(right,entry.length());	
@@ -820,22 +912,26 @@ public class Calculator implements ActionListener
 		  return answer;
 	  }
 	
-	public void prepareGraph(String expression, Double lowX, Double highX, Double increment)
+	public void prepareGraph(String expression)
 	  {
 	  double i;
 	  Double lowY = 0.00;
 	  Double highY = 0.00;
 	   
 	  String tmp = "";
+	  String tmpExp = "";
 	  ArrayList<ArrayList<Double>> list = new ArrayList<ArrayList<Double>>();
-	  ArrayList<Double> point = new ArrayList<Double>();
-	  int numTicksX = Integer.parseInt(Double.toString((Math.ceil((highX-lowX)/increment))));
-	  int numTickxY = 10;
+	  ArrayList<Double> x = new ArrayList<Double>();
+	  ArrayList<Double> y = new ArrayList<Double>();
+	  int numTicksX = (int) Math.round((highX-lowX)/incrementX);
+	  int numTicksY = 10;
 	  
-	  for(i = lowX;i<highX;i+=increment)
+	  for(i = lowX;i<highX;i+=incrementX)
 	    {
 		 userX = i;
-		 tmp = calculateParentheses(expression);
+		 System.out.println("For iteration: " + i + ", expession is: " + expression);
+		 tmpExp = expression;
+		 tmp = calculateParentheses(tmpExp);
 		 
 		 if(i == lowX) // only enter on first iteration
 		   {
@@ -845,15 +941,17 @@ public class Calculator implements ActionListener
 		 else if(Double.parseDouble(tmp) > highY) highY = Double.parseDouble(tmp); // update high
 		 else if(Double.parseDouble(tmp) < lowY)  lowY  = Double.parseDouble(tmp); // update low
 		 
-		 point.add(userX); // add x to point
-		 point.add(Double.parseDouble(tmp)); // add y to point
-		 list.add(point); // add (x,y) point to list
+		 x.add(userX); // add x to point
+		 y.add(Double.parseDouble(tmp)); // add y to point
 		}
+	  
+	  list.add(x); // add x values
+	  list.add(y); // add y values
 	  
 	  // lowY and highY should not contain the min and max Y values, respectively
 	  
 	  // call Graph()
-	  //Graph(expression,list,lowX,highX,numTicksX,lowY,highY,this);
+	   new Grapher(expression,list,lowX,highX,numTicksX,lowY,highY,numTicksY,this);
 	  }
 
 	
