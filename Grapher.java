@@ -6,18 +6,21 @@
  */
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.util.*;
 
 import javax.swing.*;
 
 
 
-public class Grapher extends JPanel// implements MouseListener
-  {
+public class Grapher extends JPanel implements MouseListener
+	{
 	String expression;
 	ArrayList<ArrayList<Double>> givenPoints;
 	double lowX, highX, lowY, highY;
@@ -26,7 +29,8 @@ public class Grapher extends JPanel// implements MouseListener
 	Calculator calculator;
 	//JWindow graphWindow = new JWindow();
 	JFrame graphFrame = new JFrame();
-	JWindow graphWindow = new JWindow();
+	JPopupMenu popupMenu = new JPopupMenu();
+	JMenuItem menuItem = new JMenuItem("              ");
 	
 	public Grapher(String expression, ArrayList<ArrayList<Double>> givenPoints, double lowX, double highX, int ticksX, double lowY, double highY, int ticksY, Calculator calculator)
 		{	
@@ -39,23 +43,27 @@ public class Grapher extends JPanel// implements MouseListener
 		this.highY = highY;
 		this.ticksY = ticksY;
 		
+		popupMenu.add(menuItem);
+		
+		
 		
 		graphFrame.add(this, "Center");
 		graphFrame.setSize(800,600); // width, height
 		graphFrame.setTitle(expression);
 		graphFrame.setVisible(true);
+		graphFrame.addMouseListener(this);
 		graphFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		}
-/*
+
 	public static void main(String[] args)
 		{
 		ArrayList<Double> xval = new ArrayList<Double>(Arrays.asList(-10.0, -9.0,-8.0,-7.0,-6.0,-5.0,-4.0,-3.0,-2.0,-1.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0)); 
 		ArrayList<Double> yval = new ArrayList<Double>(Arrays.asList(-100.0, -81.0, -64.0, -49.0, -36.0, -25.0, -16.0, -9.0, -4.0, - 1.0,0.0,1.0,4.0,9.0,16.0,25.0,36.0,49.0,64.0,81.0,100.0)); 
 		ArrayList<ArrayList<Double>> lolcatz = new ArrayList<ArrayList<Double>>(Arrays.asList(xval,yval));
 		
-		new Grapher("hi", lolcatz, -10, 10, 4, -10, 10, 4, null);
+		new Grapher("trolololol", lolcatz, -10, 10, 4, -10, 10, 4, null);
 		}
-*/
+
 	public void paint(Graphics g)
 		{
 		ArrayList<Integer> xVal = new ArrayList<Integer>();
@@ -142,23 +150,29 @@ public class Grapher extends JPanel// implements MouseListener
 			{
 			g.drawLine(5+xBuffer+1+pixelX*(x0 - Collections.min(points.get(0)) ) , 0, 5+xBuffer+1+pixelX*(x0 - Collections.min(points.get(0))) , screenHeight-yBuffer);
 			}
+		
 		}
-/*
 
-	public void mouseClicked(MouseEvent arg0){}
+
+	public void mouseClicked(MouseEvent me){}
 	public void mouseEntered(MouseEvent arg0){}
 	public void mouseExited(MouseEvent arg0) {}
 
 
-	public void mousePressed(MouseEvent arg0)
+	public void mousePressed(MouseEvent me)
 		{
-		JOptionPane.showInternalMessageDialog(this, "lolcatz");
+			String replacedString = expression.replace("x", Integer.toString(me.getX()));
+			String text = "For x = " + me.getX() + ", y = " + Integer.parseInt(calculator.calculatorFunction(replacedString));
+			
+			menuItem.setText(text);
+			
+			popupMenu.show(graphFrame, me.getX(), me.getY());
 		}
 
 
 	public void mouseReleased(MouseEvent arg0)
 		{
-		
+		popupMenu.setVisible(false);
 		}
-	*/
+	
 	}
