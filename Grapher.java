@@ -67,7 +67,9 @@ public class Grapher extends JPanel implements MouseListener
 		}
 */
 	public void paint(Graphics g)
-		{// take double ArrayList and make it an integer Array LIst
+		{
+		int i;
+		// take double ArrayList and make it an integer Array LIst
 		ArrayList<Integer> xVal = new ArrayList<Integer>();
 		for(Double x : givenPoints.get(0))
 			xVal.add((int) Math.round(x));
@@ -76,31 +78,42 @@ public class Grapher extends JPanel implements MouseListener
 			yVal.add((int) Math.round(y));
 		ArrayList<ArrayList<Integer>> points = new ArrayList<ArrayList<Integer>>(Arrays.asList(xVal, yVal));
 		
-		
-		int i;
+		// repaint the screen and get its dimensions
 		super.paint(g);
 		Dimension screen = graphFrame.getSize();
 		int screenHeight = screen.height - 22;
 		int screenWidth = screen.width - 50; 
+		
 		int yBuffer = 50;
 		int xBuffer = 50;
-		
-		//System.out.println("Screen: " + screenWidth + " " + screenHeight);
 		
 		int plotHeight = (screenHeight) - yBuffer;
 		int plotWidth = screenWidth - xBuffer+1;
 		
-		//System.out.println("Plot: " + plotWidth + " " + plotHeight);
-		
 		int xRange = ( Collections.max(points.get(0)) - Collections.min(points.get(0)) );
-		//System.out.println(xRange);
-		
 		int yRange = ( Collections.max(points.get(1)) - Collections.min(points.get(1)) );
+		int yRangeORIGINAL = yRange;
+		
+		while(xRange > plotWidth)
+			{
+			for(i = 0; i<points.get(0).size();i++)
+				{
+				points.get(0).set(i, (points.get(0).get(i)/2));
+				xRange = ( Collections.max(points.get(0)) - Collections.min(points.get(0)) );
+				}
+			}
+		
+		while(yRange > plotHeight)
+			{
+			for(i = 0; i<points.get(1).size();i++)
+				{
+				points.get(1).set(i, (points.get(1).get(i)/2));
+				yRange = ( Collections.max(points.get(1)) - Collections.min(points.get(1)) );
+				}
+			}
 		
 		int pixelX = plotWidth/xRange;
 		int pixelY = plotHeight/yRange;
-		
-		//System.out.println("Pixel: " + pixelX + " " + pixelY);
 
 		int xIncrement = ((xBuffer+1+pixelX*( Collections.max(points.get(0)) - Collections.min(points.get(0)) )) - (xBuffer+1))/(ticksX);
 		int yIncrement = ( (screenHeight - yBuffer) - (5+screenHeight-yBuffer-pixelY*( Collections.max(points.get(1)) - Collections.min(points.get(1)) )))/(ticksY);
@@ -122,17 +135,12 @@ public class Grapher extends JPanel implements MouseListener
 			g.drawString("-", xBuffer, screenHeight-yBuffer-yIncrement*i);
 		
 		// tick labels
-		for(i=1; i<= ticksX; i++){
-			g.drawString((new BigDecimal((Collections.min(givenPoints.get(0)) + ((double) xRange/(double) ticksX)*i)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()), xBuffer+xIncrement*i-10, screenHeight-yBuffer+yBuffer/4);
-			//g.drawString(Integer.toString((int) Math.round((Collections.min(points.get(0)) + ((double) xRange/(double) ticksX)*i))), xBuffer+xIncrement*i-10, screenHeight-yBuffer+yBuffer/4);
-	//		System.out.println((Collections.min(points.get(0)) + (xRange/ticksX)*i));
-	//		System.out.println((xRange/ticksX)*i);
-	//		System.out.println(xRange + " "  + ticksX + " " + (xRange/ticksX));
-		}
-		for(i=1; i<= ticksY; i++)
-			g.drawString(Integer.toString((int) Math.round((Collections.min(points.get(1)) + ((double) yRange/(double) ticksY)*i))), 3*xBuffer/4-25, screenHeight-yBuffer-yIncrement*i);
-			//g.drawString(Integer.toString(Collections.min(points.get(1)) + (yRange/ticksY)*i), 3*xBuffer/4-25, screenHeight-yBuffer-yIncrement*i);
+		for(i=1; i<= ticksX; i++)
+			g.drawString((new BigDecimal(givenPoints.get(0).get(i)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()), xBuffer+xIncrement*i-10, screenHeight-yBuffer+yBuffer/4);
 		
+		for(i=1; i<= ticksY; i++)
+			g.drawString((new BigDecimal((Collections.min(givenPoints.get(1)) + ((double) yRangeORIGINAL/(double) ticksY)*i)).setScale(0,  BigDecimal.ROUND_HALF_UP).toString()), 3*xBuffer/4-25, screenHeight-yBuffer-yIncrement*i);
+			
 		// change color
 		g.setColor(Color.BLUE);
 		
@@ -185,6 +193,8 @@ public class Grapher extends JPanel implements MouseListener
 			int xRange = ( Collections.max(points.get(0)) - Collections.min(points.get(0)) );
 			double valueX = lowX + (ratio * xRange) ;
 			String replacedString = expression.replace("x", Double.toString(valueX));
+			replacedString = replacedString.replace("e", Double.toString(Math.E));
+			replacedString = replacedString.replace("pi", Double.toString(Math.PI));
 			String text = "For x = " + new BigDecimal(valueX).setScale(2, BigDecimal.ROUND_HALF_UP) + ", y = " + calculator.calculatorFunction(replacedString);
 			menuItem.setText(text);
 			
