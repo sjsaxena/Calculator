@@ -37,7 +37,9 @@ public class Calculator implements ActionListener
 	private JLabel inputLabel = new JLabel("Enter input");
 	private JLabel outputLabel = new JLabel(" Result -> ");
 	private JLabel errorLabel = new JLabel("");
-	private JLabel xRangeLabel = new JLabel("    low X          high X     X increment");
+	private JLabel lowXLabel = new JLabel("low X  ->  ");
+	private JLabel highXLabel =  new JLabel("high X");
+	private JLabel incrementXLabel = new JLabel("X increment");
 	private JButton xButton = new JButton("Update X = ");
 	private JButton xRangeButton = new JButton("Update X Range");
 	private JButton precisionButton = new JButton("Update Precision:");
@@ -88,8 +90,12 @@ public class Calculator implements ActionListener
 		c.gridx = 0;
 		c.gridy = 1;
 		topPanel.add(errorLabel,c);
-		c.gridx = 6;
-		topPanel.add(xRangeLabel,c);
+		c.gridx = 7;
+		topPanel.add(lowXLabel,c);
+		c.gridx = 8;
+		topPanel.add(highXLabel,c);
+		c.gridx = 9;
+		topPanel.add(incrementXLabel,c);
 		
 		
 		bottomPanel.setLayout(new GridLayout(1,3));
