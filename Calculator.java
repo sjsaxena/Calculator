@@ -926,7 +926,7 @@ public class Calculator implements ActionListener
 	  int numTicksX = (int) Math.round((highX-lowX)/incrementX);
 	  int numTicksY = 10;
 	  
-	  for(i = lowX;i<highX;i+=incrementX)
+	  for(i = lowX;i<=highX;i+=incrementX)
 	    {
 		 userX = i;
 		 System.out.println("For iteration: " + i + ", expession is: " + expression);
