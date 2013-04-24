@@ -21,7 +21,7 @@ import javax.swing.*;
 
 
 public class Grapher extends JPanel implements MouseListener
-  {
+	{
 	String expression;
 	ArrayList<ArrayList<Double>> givenPoints;
 	double lowX, highX, lowY, highY;
@@ -81,7 +81,7 @@ public class Grapher extends JPanel implements MouseListener
 		super.paint(g);
 		Dimension screen = graphFrame.getSize();
 		int screenHeight = screen.height - 22;
-		int screenWidth = screen.width; 
+		int screenWidth = screen.width - 50; 
 		int yBuffer = 50;
 		int xBuffer = 50;
 		
@@ -123,7 +123,8 @@ public class Grapher extends JPanel implements MouseListener
 		
 		// tick labels
 		for(i=1; i<= ticksX; i++){
-			g.drawString(Integer.toString((int) Math.round((Collections.min(points.get(0)) + ((double) xRange/(double) ticksX)*i))), xBuffer+xIncrement*i-10, screenHeight-yBuffer+yBuffer/4);
+			g.drawString((new BigDecimal((Collections.min(givenPoints.get(0)) + ((double) xRange/(double) ticksX)*i)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()), xBuffer+xIncrement*i-10, screenHeight-yBuffer+yBuffer/4);
+			//g.drawString(Integer.toString((int) Math.round((Collections.min(points.get(0)) + ((double) xRange/(double) ticksX)*i))), xBuffer+xIncrement*i-10, screenHeight-yBuffer+yBuffer/4);
 	//		System.out.println((Collections.min(points.get(0)) + (xRange/ticksX)*i));
 	//		System.out.println((xRange/ticksX)*i);
 	//		System.out.println(xRange + " "  + ticksX + " " + (xRange/ticksX));
