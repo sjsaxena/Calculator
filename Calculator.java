@@ -24,125 +24,126 @@ public class Calculator implements ActionListener
 	private String newLine = System.getProperty("line.separator");
 		
 	//GUI Objects
-	private JFrame window = new JFrame("Calculator");
-	private JTextField inputTextField = new JTextField(20);
-	private JTextField outputTextField = new JTextField(10);
-	private JTextField precisionTextField = new JTextField(5); 
-	private JTextField highXTextField = new JTextField(5);
-	private JTextField lowXTextField = new JTextField(5);
-	private JTextField incrementXTextField = new JTextField(5);
-	private JTextField xTextField = new JTextField(15);
-	private JTextArea logTextArea = new JTextArea();
-	private JScrollPane logScrollPane = new JScrollPane(logTextArea);
-	private JLabel inputLabel = new JLabel("Enter input");
-	private JLabel outputLabel = new JLabel(" Result -> ");
-	private JLabel errorLabel = new JLabel("");
-	private JLabel lowXLabel = new JLabel("low X  ->  ");
-	private JLabel highXLabel =  new JLabel("high X");
-	private JLabel incrementXLabel = new JLabel("X increment");
-	private JButton xButton = new JButton("Update X = ");
-	private JButton xRangeButton = new JButton("Update X Range");
-	private JButton precisionButton = new JButton("Update Precision:");
-	private JButton clearButton = new JButton("Clear");
-	private JButton recallButton = new JButton("Recall");
-	private JButton graphButton = new JButton("GRAPH EXPRESSION!");
-	private JPanel topPanel = new JPanel(new GridBagLayout());
-	GridBagConstraints c = new GridBagConstraints();
-	private JRadioButton accumulatorMode = new JRadioButton("Accumulator", true);
-	private JRadioButton calculatorMode = new JRadioButton("Calculator", false);
-	private JRadioButton testMode = new JRadioButton("Test Mode", false);
-	private ButtonGroup bGroup = new ButtonGroup();
-	private JPanel bottomPanel = new JPanel();
-	private boolean xRangeIsOkay = false;
+		private JFrame window = new JFrame("Calculator");
+		private JTextField inputTextField = new JTextField(20);
+		private JTextField outputTextField = new JTextField(10);
+		private JTextField precisionTextField = new JTextField(5); 
+		private JTextField highXTextField = new JTextField(5);
+		private JTextField lowXTextField = new JTextField(5);
+		private JTextField incrementXTextField = new JTextField(5);
+		private JTextField xTextField = new JTextField(15);
+		private JTextArea logTextArea = new JTextArea();
+		private JScrollPane logScrollPane = new JScrollPane(logTextArea);
+		private JLabel inputLabel = new JLabel("Enter input");
+		private JLabel outputLabel = new JLabel(" Result -> ");
+		private JLabel errorLabel = new JLabel("");
+		private JLabel lowXLabel = new JLabel("low X  ->  ");
+		private JLabel highXLabel =  new JLabel("high X");
+		private JLabel incrementXLabel = new JLabel("X increment");
+		private JButton xButton = new JButton("Update X = ");
+		private JButton xRangeButton = new JButton("Update X Range");
+		private JButton precisionButton = new JButton("Update Precision:");
+		private JButton clearButton = new JButton("Clear");
+		private JButton recallButton = new JButton("Recall");
+		private JButton graphButton = new JButton("GRAPH EXPRESSION!");
+		private JPanel topPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		private JRadioButton accumulatorMode = new JRadioButton("Accumulator", true);
+		private JRadioButton calculatorMode = new JRadioButton("Calculator", false);
+		private JRadioButton testMode = new JRadioButton("Test Mode", false);
+		private ButtonGroup bGroup = new ButtonGroup();
+		private JPanel bottomPanel = new JPanel();
+		private boolean xRangeIsOkay = false;
 	
 	public Calculator()
 		{
 		// -------------------------------------			
-		// ----------- BUILD GUI ---------------
-		// -------------------------------------
-		
-		//topPanel is created using GridBag to make error message appear on new row
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridy = 0;
-		c.gridx = 0;
-		topPanel.add(graphButton, c);
-		c.gridx = 1;
-		topPanel.add(recallButton, c);
-		c.gridx = 2;
-		topPanel.add(inputLabel, c);	
-		c.gridx = 3;
-		topPanel.add(inputTextField, c);
-		c.gridx = 4;
-		topPanel.add(outputLabel, c);
-		c.gridx = 5;
-		topPanel.add(outputTextField, c);
-		c.gridx = 6;
-		topPanel.add(clearButton, c);	
-		c.gridx = 7;
-		topPanel.add(lowXTextField,c);
-		c.gridx = 8;
-		topPanel.add(highXTextField,c);
-		c.gridx = 9;
-		topPanel.add(incrementXTextField,c);
-		c.gridx = 10;
-		topPanel.add(xRangeButton,c);
-		c.gridwidth = 11;
-		c.gridx = 0;
-		c.gridy = 1;
-		topPanel.add(errorLabel,c);
-		c.gridx = 7;
-		topPanel.add(lowXLabel,c);
-		c.gridx = 8;
-		topPanel.add(highXLabel,c);
-		c.gridx = 9;
-		topPanel.add(incrementXLabel,c);
-		
-		
-		bottomPanel.setLayout(new GridLayout(1,3));
-		bottomPanel.add(accumulatorMode);
-		bottomPanel.add(calculatorMode);
-		bottomPanel.add(testMode);
-		bottomPanel.add(precisionButton);
-		bottomPanel.add(precisionTextField);
-		bottomPanel.add(xButton);
-		bottomPanel.add(xTextField);
-		bottomPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mode Select"));
-		
-		
-		window.getContentPane().add(topPanel, "North");
-		window.getContentPane().add(logScrollPane, "Center");
-		window.getContentPane().add(bottomPanel, "South");
-		
-		// Set GUI attributes
-		bGroup.add(accumulatorMode);
-		bGroup.add(calculatorMode);
-		bGroup.add(testMode);
-		logTextArea.setEditable(false);
-		logTextArea.setFont(new Font("default", Font.BOLD, 20));
-		clearButton.setBackground((Color.BLACK));
-		clearButton.setForeground(Color.YELLOW);
-		errorLabel.setForeground(Color.RED);
-		inputTextField.setEditable(true);
-		outputTextField.setEditable(false);
-		window.setLocation(10, 10); // horizontal, vertical
-		window.setSize(1400, 500); // width,height in pixels
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    window.setVisible(true);
-	    logTextArea.setText(""); //  clear log
-	    precisionTextField.setText("2");
-	    xTextField.setText("0.00");
-		
-		// Set event notification
-		inputTextField.addActionListener(this);
-		precisionButton.addActionListener(this);
-		recallButton.addActionListener(this);
-		clearButton.addActionListener(this);
-		accumulatorMode.addActionListener(this);
-		calculatorMode.addActionListener(this);
-		testMode.addActionListener(this);
-		xButton.addActionListener(this);
-		graphButton.addActionListener(this);
-		xRangeButton.addActionListener(this);
+				// ----------- BUILD GUI ---------------
+				// -------------------------------------
+
+				//topPanel is created using GridBag to make error message appear on new row
+				c.fill = GridBagConstraints.HORIZONTAL;
+				c.gridy = 0;
+				c.gridx = 0;
+				topPanel.add(graphButton, c);
+				c.gridx = 1;
+				topPanel.add(recallButton, c);
+				c.gridx = 2;
+				topPanel.add(inputLabel, c);	
+				c.gridx = 3;
+				topPanel.add(inputTextField, c);
+				c.gridx = 4;
+				topPanel.add(outputLabel, c);
+				c.gridx = 5;
+				topPanel.add(outputTextField, c);
+				c.gridx = 6;
+				topPanel.add(clearButton, c);	
+				c.gridx = 7;
+				topPanel.add(lowXTextField,c);
+				c.gridx = 8;
+				topPanel.add(highXTextField,c);
+				c.gridx = 9;
+				topPanel.add(incrementXTextField,c);
+				c.gridx = 10;
+				topPanel.add(xRangeButton,c);
+				c.gridwidth = 11;
+				c.gridx = 0;
+				c.gridy = 1;
+				topPanel.add(errorLabel,c);
+				c.gridx = 7;
+				topPanel.add(lowXLabel,c);
+				c.gridx = 8;
+				topPanel.add(highXLabel,c);
+				c.gridx = 9;
+				topPanel.add(incrementXLabel,c);
+
+
+				bottomPanel.setLayout(new GridLayout(1,3));
+				bottomPanel.add(accumulatorMode);
+				bottomPanel.add(calculatorMode);
+				bottomPanel.add(testMode);
+				bottomPanel.add(precisionButton);
+				bottomPanel.add(precisionTextField);
+				bottomPanel.add(xButton);
+				bottomPanel.add(xTextField);
+				bottomPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mode Select"));
+
+
+				window.getContentPane().add(topPanel, "North");
+				window.getContentPane().add(logScrollPane, "Center");
+				window.getContentPane().add(bottomPanel, "South");
+
+				// Set GUI attributes
+				bGroup.add(accumulatorMode);
+				bGroup.add(calculatorMode);
+				bGroup.add(testMode);
+				logTextArea.setEditable(false);
+				logTextArea.setFont(new Font("default", Font.BOLD, 20));
+				clearButton.setBackground((Color.BLACK));
+				clearButton.setForeground(Color.YELLOW);
+				errorLabel.setForeground(Color.RED);
+				inputTextField.setEditable(true);
+				outputTextField.setEditable(false);
+				window.setLocation(10, 10); // horizontal, vertical
+				window.setSize(1400, 500); // width,height in pixels
+				window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			    window.setVisible(true);
+			    logTextArea.setText(""); //  clear log
+			    precisionTextField.setText("2");
+			    xTextField.setText("0.00");
+
+				// Set event notification
+				inputTextField.addActionListener(this);
+				precisionButton.addActionListener(this);
+				recallButton.addActionListener(this);
+				clearButton.addActionListener(this);
+				accumulatorMode.addActionListener(this);
+				calculatorMode.addActionListener(this);
+				testMode.addActionListener(this);
+				xButton.addActionListener(this);
+				graphButton.addActionListener(this);
+				xRangeButton.addActionListener(this);
+
 		
 		}
 
@@ -641,6 +642,14 @@ public class Calculator implements ActionListener
 			entry = entry.replace("x", Double.toString(userX));
 			usesX = true;
 		}
+	  if(entry.contains("pi")){
+			entry = entry.replace("pi", Double.toString(Math.PI));
+			usesX = true;
+		}
+	  if(entry.contains("e")){
+			entry = entry.replace("e", Double.toString(Math.E));
+			usesX = true;
+		}
 
 	  CharSequence negOps[] = {"+-","--"};
 	  CharSequence negOps2[] = {"-","+"};
@@ -793,13 +802,13 @@ public class Calculator implements ActionListener
 	  		  if(entry.charAt(left) == '-')
 	  		    {
 	  			if(left > 0){
-	  			System.out.println("Heythere");
+	  			//System.out.println("Heythere");
 	  			if((entry.charAt(left-1)=='*') || (entry.charAt(left-1)=='/') || (entry.charAt(left-1)=='^') || (entry.charAt(left-1)=='r')) 
 	  				{
-	  				System.out.println("You dun fucked up");
+	  				//System.out.println("You dun fucked up");
 	  				left--;
 	  				opCount--;
-	  				System.out.println(entry.charAt(left));
+	  				//System.out.println(entry.charAt(left));
 	  				}  
 	  			}
 	  		    }
